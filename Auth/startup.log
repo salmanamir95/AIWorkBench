@@ -1,0 +1,84 @@
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper (file:/usr/share/maven/lib/guava.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--------------------------< [0;36mcom.example:Auth[0;1m >--------------------------[m
+[[1;34mINFO[m] [1mBuilding Auth 0.0.1-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;33mWARNING[m] The artifact mysql:mysql-connector-java:jar:8.0.33 has been relocated to com.mysql:mysql-connector-j:jar:8.0.33: MySQL Connector/J artifacts moved to reverse-DNS compliant Maven 2+ coordinates.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-clean-plugin:3.5.0:clean[m [1m(default-clean)[m @ [36mAuth[0;1m ---[m
+[[1;34mINFO[m] Deleting /home/binaryhive/Public/Portfolio/AIWorkbench/Auth/target
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m>>> [0;32mspring-boot-maven-plugin:4.0.3:run[m [1m(default-cli)[0;1m > [0;1mtest-compile[m @ [36mAuth[0;1m >>>[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:resources[m [1m(default-resources)[m @ [36mAuth[0;1m ---[m
+[[1;34mINFO[m] Copying 1 resource from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 3 resources from src/main/resources to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.14.1:compile[m [1m(default-compile)[m @ [36mAuth[0;1m ---[m
+[[1;34mINFO[m] Recompiling the module because of [1mchanged source code[m.
+[[1;34mINFO[m] Compiling 11 source files with javac [debug parameters release 25] to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:testResources[m [1m(default-testResources)[m @ [36mAuth[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/binaryhive/Public/Portfolio/AIWorkbench/Auth/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.14.1:testCompile[m [1m(default-testCompile)[m @ [36mAuth[0;1m ---[m
+[[1;34mINFO[m] Recompiling the module because of [1mchanged dependency[m.
+[[1;34mINFO[m] Compiling 1 source file with javac [debug parameters release 25] to target/test-classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m<<< [0;32mspring-boot-maven-plugin:4.0.3:run[m [1m(default-cli)[0;1m < [0;1mtest-compile[m @ [36mAuth[0;1m <<<[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mspring-boot-maven-plugin:4.0.3:run[m [1m(default-cli)[m @ [36mAuth[0;1m ---[m
+[[1;34mINFO[m] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-03-08T23:34:26.280+05:00  INFO 151017 --- [Auth] [           main] com.example.Auth.AuthApplication         : Starting AuthApplication using Java 25 with PID 151017 (/home/binaryhive/Public/Portfolio/AIWorkbench/Auth/target/classes started by binaryhive in /home/binaryhive/Public/Portfolio/AIWorkbench/Auth)
+2026-03-08T23:34:26.286+05:00  INFO 151017 --- [Auth] [           main] com.example.Auth.AuthApplication         : No active profile set, falling back to 1 default profile: "default"
+2026-03-08T23:34:27.965+05:00  INFO 151017 --- [Auth] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-08T23:34:28.099+05:00  INFO 151017 --- [Auth] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 114 ms. Found 2 JPA repository interfaces.
+2026-03-08T23:34:29.244+05:00  INFO 151017 --- [Auth] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-03-08T23:34:29.270+05:00  INFO 151017 --- [Auth] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-08T23:34:29.271+05:00  INFO 151017 --- [Auth] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-03-08T23:34:29.363+05:00  INFO 151017 --- [Auth] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2889 ms
+2026-03-08T23:34:29.668+05:00  INFO 151017 --- [Auth] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-03-08T23:34:29.742+05:00  INFO 151017 --- [Auth] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
+2026-03-08T23:34:30.451+05:00  INFO 151017 --- [Auth] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-08T23:34:30.509+05:00  INFO 151017 --- [Auth] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-08T23:34:31.101+05:00  INFO 151017 --- [Auth] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@10fc1a22
+2026-03-08T23:34:31.103+05:00  INFO 151017 --- [Auth] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-08T23:34:31.254+05:00  INFO 151017 --- [Auth] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/AIWorkBench?allowMultiQueries=true]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.45
+	Default catalog/schema: AIWorkBench/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-03-08T23:34:32.932+05:00  INFO 151017 --- [Auth] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-08T23:34:32.945+05:00  INFO 151017 --- [Auth] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-08T23:34:33.103+05:00  INFO 151017 --- [Auth] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-03-08T23:34:34.080+05:00  WARN 151017 --- [Auth] [           main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: d787f481-026f-45a9-a559-248823b81350
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-03-08T23:34:34.166+05:00  INFO 151017 --- [Auth] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-03-08T23:34:34.477+05:00  INFO 151017 --- [Auth] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-03-08T23:34:34.491+05:00  INFO 151017 --- [Auth] [           main] com.example.Auth.AuthApplication         : Started AuthApplication in 9.393 seconds (process running for 10.141)
