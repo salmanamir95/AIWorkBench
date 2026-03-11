@@ -1,12 +1,7 @@
-CREATE TRIGGER trg_user_before_insert
-BEFORE INSERT ON users
+CREATE TRIGGER trg_user_auth_before_insert
+BEFORE INSERT ON user_auth
 FOR EACH ROW
 BEGIN
-    IF NEW.name IS NULL OR TRIM(NEW.name) = '' THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Name cannot be empty';
-    END IF;
-
     IF NEW.email IS NULL OR TRIM(NEW.email) = '' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Email cannot be empty';
@@ -18,15 +13,10 @@ BEGIN
     END IF;
 END;
 
-CREATE TRIGGER trg_user_before_update
-BEFORE UPDATE ON users
+CREATE TRIGGER trg_user_auth_before_update
+BEFORE UPDATE ON user_auth
 FOR EACH ROW
 BEGIN
-    IF NEW.name IS NULL OR TRIM(NEW.name) = '' THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Name cannot be empty';
-    END IF;
-
     IF NEW.password NOT LIKE '$argon2%' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Password must be Argon2 hashed before storing';

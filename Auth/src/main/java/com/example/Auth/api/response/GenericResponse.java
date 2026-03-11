@@ -13,7 +13,7 @@ public record GenericResponse<T>(
         return new GenericResponse<>(true, null, msg);
     }
 
-    public static GenericResponse<Void> failure(final String msg) {
+    public static <T> GenericResponse<T> failure(final String msg) {
         return new GenericResponse<>(false, null, msg);
     }
 }

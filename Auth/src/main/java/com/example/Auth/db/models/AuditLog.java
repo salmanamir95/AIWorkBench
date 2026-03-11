@@ -28,10 +28,10 @@ public class AuditLog {
     private Long id;
 
     @Column(nullable = false, length = 100)
-    private String entityName;          // e.g. "UserInfo"
+    private String entityName;          // e.g. "UserAuth"
 
-    @Column(nullable = false)
-    private Long entityId;              // e.g. 1
+    @Column
+    private Long entityId;              // e.g. 1 (nullable for non-entity events)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -49,7 +49,15 @@ public class AuditLog {
     // ---------- ENUM ----------
 
     public enum AuditAction {
-        CREATED, UPDATED, DELETED
+        CREATED,
+        UPDATED,
+        DELETED,
+        SIGNUP_SUCCESS,
+        SIGNUP_FAILED,
+        LOGIN_SUCCESS,
+        LOGIN_FAILED,
+        PASSWORD_CHANGE_SUCCESS,
+        PASSWORD_CHANGE_FAILED
     }
 
     // ---------- CONSTRUCTORS ----------

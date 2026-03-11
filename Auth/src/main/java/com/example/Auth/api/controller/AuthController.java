@@ -15,6 +15,8 @@ import com.example.Auth.api.dto.LoginRequest;
 import com.example.Auth.api.dto.SignUpRequest;
 import com.example.Auth.api.dto.UserCredentials;
 import com.example.Auth.api.response.GenericResponse;
+import com.example.Auth.db.audit.AuditLogService;
+import com.example.Auth.db.models.AuditLog;
 import com.example.Auth.db.models.UserAuth;
 import com.example.Auth.db.service.UserAuthService;
 
@@ -29,28 +31,67 @@ public class AuthController {
 
     private final UserAuthService userAuthService;
     private final AuthenticationManager authenticationManager;
+    private final AuditLogService auditLogService;
 
     public AuthController(
             final UserAuthService userAuthService,
-            final AuthenticationManager authenticationManager
+            final AuthenticationManager authenticationManager,
+            final AuditLogService auditLogService
     ) {
         this.userAuthService = userAuthService;
         this.authenticationManager = authenticationManager;
+        this.auditLogService = auditLogService;
     }
 
     @PostMapping("/signup")
     @Operation(summary = "Register user")
     public ResponseEntity<GenericResponse<UserCredentials>> signUp(@Valid @RequestBody final SignUpRequest request) {
-        final UserAuth user = userAuthService.registerUser(request.email(), request.password());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(GenericResponse.success(UserCredentials.from(user), "User registered successfully"));
+        try {
+            final UserAuth user = userAuthService.registerUser(request.email(), request.password());
+            auditLogService.log(
+                    "UserAuth",
+                    user.getId(),
+                    AuditLog.AuditAction.SIGNUP_SUCCESS,
+                    user.getEmail(),
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(GenericResponse.success(UserCredentials.from(user), "User registered successfully"));
+        } catch (final RuntimeException ex) {
+            auditLogService.log(
+                    "UserAuth",
+                    null,
+                    AuditLog.AuditAction.SIGNUP_FAILED,
+                    request.email(),
+                    ex.getMessage()
+            );
+            throw ex;
+        }
     }
 
     @PostMapping("/login")
     @Operation(summary = "Login user")
     public ResponseEntity<GenericResponse<UserCredentials>> login(@Valid @RequestBody final LoginRequest request) {
-        final UserAuth user = authenticationManager.authenticate(request.email(), request.password());
-        return ResponseEntity.ok(GenericResponse.success(UserCredentials.from(user), "Login successful"));
+        try {
+            final UserAuth user = authenticationManager.authenticate(request.email(), request.password());
+            auditLogService.log(
+                    "UserAuth",
+                    user.getId(),
+                    AuditLog.AuditAction.LOGIN_SUCCESS,
+                    user.getEmail(),
+                    null
+            );
+            return ResponseEntity.ok(GenericResponse.success(UserCredentials.from(user), "Login successful"));
+        } catch (final RuntimeException ex) {
+            auditLogService.log(
+                    "UserAuth",
+                    null,
+                    AuditLog.AuditAction.LOGIN_FAILED,
+                    request.email(),
+                    ex.getMessage()
+            );
+            throw ex;
+        }
     }
 
     @PatchMapping("/users/{id}/password")
@@ -59,7 +100,25 @@ public class AuthController {
             @PathVariable final Long id,
             @Valid @RequestBody final ChangePasswordRequest request
     ) {
-        userAuthService.changePassword(id, request.newPassword());
-        return ResponseEntity.ok(GenericResponse.success("Password changed successfully"));
+        try {
+            final UserAuth user = userAuthService.changePassword(id, request.newPassword());
+            auditLogService.log(
+                    "UserAuth",
+                    user.getId(),
+                    AuditLog.AuditAction.PASSWORD_CHANGE_SUCCESS,
+                    user.getEmail(),
+                    null
+            );
+            return ResponseEntity.ok(GenericResponse.success("Password changed successfully"));
+        } catch (final RuntimeException ex) {
+            auditLogService.log(
+                    "UserAuth",
+                    id,
+                    AuditLog.AuditAction.PASSWORD_CHANGE_FAILED,
+                    "userId:" + id,
+                    ex.getMessage()
+            );
+            throw ex;
+        }
     }
 }

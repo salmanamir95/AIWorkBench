@@ -59,7 +59,7 @@ public class UserAuthService {
     // ---------- PASSWORD CHANGE ----------
 
     @Transactional
-    public void changePassword(
+    public UserAuth changePassword(
             final Long userId,
             final String rawNewPassword
     ) {
@@ -69,7 +69,7 @@ public class UserAuthService {
 
         user.changePassword(hashedPassword);
 
-        userAuthRepository.save(user);
+        return userAuthRepository.save(user);
     }
 
     // ---------- ACCOUNT SECURITY ----------

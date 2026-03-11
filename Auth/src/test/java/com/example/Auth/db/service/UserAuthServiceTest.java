@@ -65,12 +65,13 @@ class UserAuthServiceTest {
         when(passwordEncoder.encode("new-pass")).thenReturn("$argon2id$new");
         when(userAuthRepository.save(any(UserAuth.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        userAuthService.changePassword(7L, "new-pass");
+        final UserAuth updated = userAuthService.changePassword(7L, "new-pass");
 
         final ArgumentCaptor<UserAuth> captor = ArgumentCaptor.forClass(UserAuth.class);
         verify(userAuthRepository).save(captor.capture());
         final UserAuth saved = captor.getValue();
 
         assertEquals("$argon2id$new", saved.getPassword());
+        assertEquals("$argon2id$new", updated.getPassword());
     }
 }

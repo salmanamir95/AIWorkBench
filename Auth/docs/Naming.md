@@ -1,16 +1,16 @@
-| Layer      | Responsibilities                         | Example Classes  |
-| ---------- | ---------------------------------------- | ---------------- |
-| Repository | Access DB, CRUD operations               | `UserRepository` |
-| Service    | Business logic, transactions, validation | `UserService`    |
-| Controller | Handle HTTP requests, return responses   | `UserController` |
+| Layer      | Responsibilities                         | Example Classes           |
+| ---------- | ---------------------------------------- | ------------------------- |
+| Repository | Access DB, CRUD operations               | `UserAuthRepository`      |
+| Service    | Business logic, transactions, validation | `UserAuthService`         |
+| Controller | Handle HTTP requests, return responses   | `AuthController`          |
 
 
 Controller → Service → Repository → DB
 
 
 
-| Component    | Responsibility                                  |
-| ------------ | ----------------------------------------------- |
-| AuthProvider | Fetch user credentials from a source            |
-| AuthVerifier | Verify credentials (password, token, OTP, etc.) |
-| AuthManager  | Orchestrates authentication logic               |
+| Component             | Responsibility                                         |
+| --------------------- | ------------------------------------------------------ |
+| `AuthenticationProvider` | Fetch user credentials + validate password          |
+| `AuthenticationVerifier` | Verify account state (locked, email verified, etc.) |
+| `AuthenticationManager`  | Orchestrates authentication flow                    |
