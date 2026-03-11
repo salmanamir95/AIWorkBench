@@ -9,13 +9,15 @@ Client → API Gateway → Microservices → Datastores
                       ↘→ SMTP / External Providers
 ```
 
-**Key principles**
-- Single responsibility per service.
-- Data ownership per service.
-- Explicit and versioned API contracts.
-- Observability, audit, and security by default.
+## Principles
 
-## Services (Current + Planned)
+- Single responsibility per service.
+- Each service owns its data and schema.
+- Contracts are explicit and versioned.
+- Prefer async events for cross-service side effects.
+- Security, audit, and observability are first-class.
+
+## Microservices Overview
 
 - **Gateway**: Routing, TLS termination, auth enforcement, rate limits.
 - **Auth**: Identity, JWT issuance, refresh tokens, email verification.
@@ -23,7 +25,9 @@ Client → API Gateway → Microservices → Datastores
 - **Team**: Teams, memberships, roles, invitations.
 - **Workflow**: Workflow definitions, approvals, transitions.
 - **Asset**: Asset metadata, ownership, classification, versioning.
+- **Asset Sharing**: P2P sharing service for asset distribution and access.
 - **Encryption**: Key management, encryption policies, approvals.
+- **AI Service**: Unified endpoints for all AI capabilities and models.
 - **Tools**: Tool catalog and execution metadata.
 - **Notification**: Email/SMS/in-app notifications.
 - **Audit**: Centralized immutable security logs.
@@ -31,6 +35,42 @@ Client → API Gateway → Microservices → Datastores
 - **Integration**: Webhooks and third-party connectors.
 - **Billing**: Plans, quotas, usage metering.
 - **Analytics**: Usage analytics and KPIs.
+
+## Data Ownership
+
+- Auth owns credentials, refresh tokens, OTPs.
+- User owns profile data and preferences.
+- Team owns org structures and membership.
+- Workflow owns workflow states and approvals.
+- Asset owns asset metadata and lineage.
+- Encryption owns keys, policies, and rotation history.
+- Audit stores immutable security events.
+
+## Roadmap Phases
+
+**Phase 1 — Core Platform**
+- Auth service and Gateway.
+- User and Team services.
+- Basic audit logging.
+
+**Phase 2 — Collaboration Backbone**
+- Workflow service.
+- Asset service (metadata only).
+- Notification service.
+
+**Phase 3 — Security & Compliance**
+- Encryption service with key management.
+- Audit service with immutable logs.
+- Policy enforcement in Gateway and Workflow.
+
+**Phase 4 — Productivity & Extensibility**
+- Tools service and Integration service.
+- Search service for fast discovery.
+
+**Phase 5 — Scale & Intelligence**
+- Analytics service.
+- Billing service.
+- Performance, reliability, and SLOs.
 
 ## Current Implementation
 
