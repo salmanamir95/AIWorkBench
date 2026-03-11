@@ -1,12 +1,9 @@
 package com.example.Auth.Manager;
 
-import org.springframework.stereotype.Component;
-
 import com.example.Auth.db.models.UserAuth;
 import com.example.Auth.provider.AuthenticationProvider;
 import com.example.Auth.verifier.AuthenticationVerifier;
 
-@Component
 public class AuthenticationManager {
 
     private final AuthenticationProvider authenticationProvider;

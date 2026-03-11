@@ -26,7 +26,7 @@ public class AuthenticationConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
+    public AuthenticationManager appAuthenticationManager(
             final AuthenticationProvider authenticationProvider,
             final AuthenticationVerifier authenticationVerifier
     ) {
