@@ -36,4 +36,10 @@ public class AuthenticationProvider {
 
         return user;
     }
+
+    public UserAuth loadByEmail(final String email) {
+        return userAuthRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+    }
 }

@@ -16,15 +16,11 @@ import com.example.Auth.api.dto.LoginRequest;
 import com.example.Auth.api.dto.LogoutRequest;
 import com.example.Auth.api.dto.RefreshTokenRequest;
 import com.example.Auth.api.dto.SignUpRequest;
-import com.example.Auth.api.dto.UserCredentials;
 import com.example.Auth.api.response.GenericResponse;
 import com.example.Auth.db.audit.AuditLogService;
 import com.example.Auth.db.models.AuditLog;
-import com.example.Auth.db.models.RefreshToken;
 import com.example.Auth.db.models.UserAuth;
-import com.example.Auth.db.service.RefreshTokenService;
 import com.example.Auth.db.service.UserAuthService;
-import com.example.Auth.security.JwtService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,21 +34,15 @@ public class AuthController {
     private final UserAuthService userAuthService;
     private final AuthenticationManager authenticationManager;
     private final AuditLogService auditLogService;
-    private final JwtService jwtService;
-    private final RefreshTokenService refreshTokenService;
 
     public AuthController(
             final UserAuthService userAuthService,
             final AuthenticationManager authenticationManager,
-            final AuditLogService auditLogService,
-            final JwtService jwtService,
-            final RefreshTokenService refreshTokenService
+            final AuditLogService auditLogService
     ) {
         this.userAuthService = userAuthService;
         this.authenticationManager = authenticationManager;
         this.auditLogService = auditLogService;
-        this.jwtService = jwtService;
-        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/signup")
@@ -68,7 +58,7 @@ public class AuthController {
                     null
             );
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(GenericResponse.success(buildAuthResponse(user), "User registered successfully"));
+                    .body(GenericResponse.success(authenticationManager.issueTokens(user), "User registered successfully"));
         } catch (final RuntimeException ex) {
             auditLogService.log(
                     "UserAuth",
@@ -85,15 +75,15 @@ public class AuthController {
     @Operation(summary = "Login user")
     public ResponseEntity<GenericResponse<AuthResponse>> login(@Valid @RequestBody final LoginRequest request) {
         try {
-            final UserAuth user = authenticationManager.authenticate(request.email(), request.password());
+            final AuthResponse response = authenticationManager.authenticateAndIssueTokens(request.email(), request.password());
             auditLogService.log(
                     "UserAuth",
-                    user.getId(),
+                    response.user().id(),
                     AuditLog.AuditAction.LOGIN_SUCCESS,
-                    user.getEmail(),
+                    response.user().email(),
                     null
             );
-            return ResponseEntity.ok(GenericResponse.success(buildAuthResponse(user), "Login successful"));
+            return ResponseEntity.ok(GenericResponse.success(response, "Login successful"));
         } catch (final RuntimeException ex) {
             auditLogService.log(
                     "UserAuth",
@@ -109,30 +99,51 @@ public class AuthController {
     @PostMapping("/refresh")
     @Operation(summary = "Refresh access token")
     public ResponseEntity<GenericResponse<AuthResponse>> refresh(@Valid @RequestBody final RefreshTokenRequest request) {
-        final String refreshToken = request.refreshToken();
-        if (!jwtService.isTokenValid(refreshToken) || !"refresh".equals(jwtService.extractType(refreshToken))) {
-            throw new IllegalArgumentException("Invalid refresh token");
+        try {
+            final AuthResponse response = authenticationManager.refreshTokens(request.refreshToken());
+            auditLogService.log(
+                    "RefreshToken",
+                    null,
+                    AuditLog.AuditAction.TOKEN_REFRESH_SUCCESS,
+                    response.user().email(),
+                    null
+            );
+            return ResponseEntity.ok(GenericResponse.success(response, "Token refreshed"));
+        } catch (final RuntimeException ex) {
+            auditLogService.log(
+                    "RefreshToken",
+                    null,
+                    AuditLog.AuditAction.TOKEN_REFRESH_FAILED,
+                    "refresh-token",
+                    ex.getMessage()
+            );
+            throw ex;
         }
-
-        final RefreshToken stored = refreshTokenService.getValidToken(refreshToken);
-        final UserAuth user = stored.getUserAuth();
-
-        // Rotate refresh token
-        refreshTokenService.revoke(stored);
-        final AuthResponse response = buildAuthResponse(user);
-        return ResponseEntity.ok(GenericResponse.success(response, "Token refreshed"));
     }
 
     @PostMapping("/logout")
     @Operation(summary = "Logout user")
     public ResponseEntity<GenericResponse<Void>> logout(@Valid @RequestBody final LogoutRequest request) {
-        final String refreshToken = request.refreshToken();
-        if (!jwtService.isTokenValid(refreshToken) || !"refresh".equals(jwtService.extractType(refreshToken))) {
-            throw new IllegalArgumentException("Invalid refresh token");
+        try {
+            authenticationManager.logout(request.refreshToken());
+            auditLogService.log(
+                    "RefreshToken",
+                    null,
+                    AuditLog.AuditAction.LOGOUT_SUCCESS,
+                    "refresh-token",
+                    null
+            );
+            return ResponseEntity.ok(GenericResponse.success("Logged out successfully"));
+        } catch (final RuntimeException ex) {
+            auditLogService.log(
+                    "RefreshToken",
+                    null,
+                    AuditLog.AuditAction.LOGOUT_FAILED,
+                    "refresh-token",
+                    ex.getMessage()
+            );
+            throw ex;
         }
-        final RefreshToken stored = refreshTokenService.getValidToken(refreshToken);
-        refreshTokenService.revoke(stored);
-        return ResponseEntity.ok(GenericResponse.success("Logged out successfully"));
     }
 
     @PatchMapping("/users/{id}/password")
@@ -150,7 +161,7 @@ public class AuthController {
                     user.getEmail(),
                     null
             );
-            refreshTokenService.revokeAllForUser(user);
+            authenticationManager.revokeAllForUser(user);
             return ResponseEntity.ok(GenericResponse.success("Password changed successfully"));
         } catch (final RuntimeException ex) {
             auditLogService.log(
@@ -162,20 +173,5 @@ public class AuthController {
             );
             throw ex;
         }
-    }
-
-    private AuthResponse buildAuthResponse(final UserAuth user) {
-        final String accessToken = jwtService.generateAccessToken(user);
-        final String refreshToken = jwtService.generateRefreshToken(user);
-        refreshTokenService.create(user, refreshToken, jwtService.extractExpiration(refreshToken));
-
-        return new AuthResponse(
-                UserCredentials.from(user),
-                accessToken,
-                refreshToken,
-                jwtService.getAccessTokenExpirationMs(),
-                jwtService.getRefreshTokenExpirationMs(),
-                "Bearer"
-        );
     }
 }

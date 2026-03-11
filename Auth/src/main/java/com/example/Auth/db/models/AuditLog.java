@@ -34,7 +34,7 @@ public class AuditLog {
     private Long entityId;              // e.g. 1 (nullable for non-entity events)
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 50)
     private AuditAction action;         // CREATED, UPDATED, DELETED
 
     @Column(length = 150)
@@ -57,7 +57,11 @@ public class AuditLog {
         LOGIN_SUCCESS,
         LOGIN_FAILED,
         PASSWORD_CHANGE_SUCCESS,
-        PASSWORD_CHANGE_FAILED
+        PASSWORD_CHANGE_FAILED,
+        TOKEN_REFRESH_SUCCESS,
+        TOKEN_REFRESH_FAILED,
+        LOGOUT_SUCCESS,
+        LOGOUT_FAILED
     }
 
     // ---------- CONSTRUCTORS ----------

@@ -7,7 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.Auth.Manager.AuthenticationManager;
 import com.example.Auth.db.repository.UserAuthRepository;
 import com.example.Auth.provider.AuthenticationProvider;
+import com.example.Auth.security.JwtService;
 import com.example.Auth.verifier.AuthenticationVerifier;
+import com.example.Auth.db.service.RefreshTokenService;
 
 @Configuration
 public class AuthenticationConfig {
@@ -28,9 +30,11 @@ public class AuthenticationConfig {
     @Bean
     public AuthenticationManager appAuthenticationManager(
             final AuthenticationProvider authenticationProvider,
-            final AuthenticationVerifier authenticationVerifier
+            final AuthenticationVerifier authenticationVerifier,
+            final JwtService jwtService,
+            final RefreshTokenService refreshTokenService
     ) {
-        return new AuthenticationManager(authenticationProvider, authenticationVerifier);
+        return new AuthenticationManager(authenticationProvider, authenticationVerifier, jwtService, refreshTokenService);
     }
 
 }
