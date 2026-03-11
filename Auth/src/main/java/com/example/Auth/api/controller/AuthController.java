@@ -212,6 +212,37 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/verify-email/resend")
+    @Operation(summary = "Resend email verification OTP")
+    public ResponseEntity<GenericResponse<Void>> resendEmailOtp(
+            @Valid @RequestBody final RequestEmailOtpRequest request
+    ) {
+        try {
+            final UserAuth user = userAuthService.getUserByEmail(request.email());
+            if (user.isEmailVerified()) {
+                throw new IllegalArgumentException("Email already verified");
+            }
+            emailOtpService.sendOtp(request.email());
+            auditLogService.log(
+                    "EmailOtp",
+                    null,
+                    AuditLog.AuditAction.EMAIL_OTP_SENT,
+                    request.email(),
+                    "resend"
+            );
+            return ResponseEntity.ok(GenericResponse.success("OTP resent"));
+        } catch (final RuntimeException ex) {
+            auditLogService.log(
+                    "EmailOtp",
+                    null,
+                    AuditLog.AuditAction.EMAIL_OTP_SEND_FAILED,
+                    request.email(),
+                    ex.getMessage()
+            );
+            throw ex;
+        }
+    }
+
     @PostMapping("/verify-email/confirm")
     @Operation(summary = "Verify email with OTP")
     public ResponseEntity<GenericResponse<Void>> verifyEmailOtp(
