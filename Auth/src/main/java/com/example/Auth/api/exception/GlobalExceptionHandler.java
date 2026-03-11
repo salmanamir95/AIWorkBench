@@ -3,6 +3,8 @@ package com.example.Auth.api.exception;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,14 +16,17 @@ import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<GenericResponse<Void>> handleIllegalArgument(final IllegalArgumentException ex) {
+        log.warn("IllegalArgumentException", ex);
         return ResponseEntity.ok(GenericResponse.failure(ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<GenericResponse<Void>> handleIllegalState(final IllegalStateException ex) {
+        log.warn("IllegalStateException", ex);
         return ResponseEntity.ok(GenericResponse.failure(ex.getMessage()));
     }
 
@@ -43,7 +48,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GenericResponse<Void>> handleGeneric(final Exception ex) {
-        return ResponseEntity.ok(GenericResponse.failure("Internal server error"));
+        log.error("Unhandled exception", ex);
+        final String msg = ex.getClass().getSimpleName() + ": " + (ex.getMessage() == null ? "Unknown error" : ex.getMessage());
+        return ResponseEntity.ok(GenericResponse.failure(msg));
     }
 
     private String formatFieldError(final FieldError error) {
