@@ -61,7 +61,11 @@ public class AuditLog {
         TOKEN_REFRESH_SUCCESS,
         TOKEN_REFRESH_FAILED,
         LOGOUT_SUCCESS,
-        LOGOUT_FAILED
+        LOGOUT_FAILED,
+        EMAIL_OTP_SENT,
+        EMAIL_OTP_SEND_FAILED,
+        EMAIL_VERIFY_SUCCESS,
+        EMAIL_VERIFY_FAILED
     }
 
     // ---------- CONSTRUCTORS ----------

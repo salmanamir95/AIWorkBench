@@ -15,11 +15,14 @@ import com.example.Auth.api.dto.ChangePasswordRequest;
 import com.example.Auth.api.dto.LoginRequest;
 import com.example.Auth.api.dto.LogoutRequest;
 import com.example.Auth.api.dto.RefreshTokenRequest;
+import com.example.Auth.api.dto.RequestEmailOtpRequest;
 import com.example.Auth.api.dto.SignUpRequest;
+import com.example.Auth.api.dto.VerifyEmailOtpRequest;
 import com.example.Auth.api.response.GenericResponse;
 import com.example.Auth.db.audit.AuditLogService;
 import com.example.Auth.db.models.AuditLog;
 import com.example.Auth.db.models.UserAuth;
+import com.example.Auth.db.service.EmailOtpService;
 import com.example.Auth.db.service.UserAuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,15 +37,18 @@ public class AuthController {
     private final UserAuthService userAuthService;
     private final AuthenticationManager authenticationManager;
     private final AuditLogService auditLogService;
+    private final EmailOtpService emailOtpService;
 
     public AuthController(
             final UserAuthService userAuthService,
             final AuthenticationManager authenticationManager,
-            final AuditLogService auditLogService
+            final AuditLogService auditLogService,
+            final EmailOtpService emailOtpService
     ) {
         this.userAuthService = userAuthService;
         this.authenticationManager = authenticationManager;
         this.auditLogService = auditLogService;
+        this.emailOtpService = emailOtpService;
     }
 
     @PostMapping("/signup")
@@ -169,6 +175,66 @@ public class AuthController {
                     id,
                     AuditLog.AuditAction.PASSWORD_CHANGE_FAILED,
                     "userId:" + id,
+                    ex.getMessage()
+            );
+            throw ex;
+        }
+    }
+
+    @PostMapping("/verify-email/request")
+    @Operation(summary = "Request email verification OTP")
+    public ResponseEntity<GenericResponse<Void>> requestEmailOtp(
+            @Valid @RequestBody final RequestEmailOtpRequest request
+    ) {
+        try {
+            final UserAuth user = userAuthService.getUserByEmail(request.email());
+            if (user.isEmailVerified()) {
+                throw new IllegalArgumentException("Email already verified");
+            }
+            emailOtpService.sendOtp(request.email());
+            auditLogService.log(
+                    "EmailOtp",
+                    null,
+                    AuditLog.AuditAction.EMAIL_OTP_SENT,
+                    request.email(),
+                    null
+            );
+            return ResponseEntity.ok(GenericResponse.success("OTP sent"));
+        } catch (final RuntimeException ex) {
+            auditLogService.log(
+                    "EmailOtp",
+                    null,
+                    AuditLog.AuditAction.EMAIL_OTP_SEND_FAILED,
+                    request.email(),
+                    ex.getMessage()
+            );
+            throw ex;
+        }
+    }
+
+    @PostMapping("/verify-email/confirm")
+    @Operation(summary = "Verify email with OTP")
+    public ResponseEntity<GenericResponse<Void>> verifyEmailOtp(
+            @Valid @RequestBody final VerifyEmailOtpRequest request
+    ) {
+        try {
+            emailOtpService.verifyOtp(request.email(), request.code());
+            final UserAuth user = userAuthService.getUserByEmail(request.email());
+            userAuthService.verifyEmail(user.getId());
+            auditLogService.log(
+                    "UserAuth",
+                    user.getId(),
+                    AuditLog.AuditAction.EMAIL_VERIFY_SUCCESS,
+                    user.getEmail(),
+                    null
+            );
+            return ResponseEntity.ok(GenericResponse.success("Email verified"));
+        } catch (final RuntimeException ex) {
+            auditLogService.log(
+                    "EmailOtp",
+                    null,
+                    AuditLog.AuditAction.EMAIL_VERIFY_FAILED,
+                    request.email(),
                     ex.getMessage()
             );
             throw ex;
