@@ -1,265 +1,95 @@
-# **Phase 0 — Preparation / Foundation (Junior Foundation)**
+# AIWorkbench Roadmap
 
-**Goal:** Set up your development environment and learn the core technologies.
+This roadmap defines the platform as a set of focused microservices. Each service owns a single responsibility, its own data, and a clear API contract.
 
-**Tasks:**
+## Principles
 
-1. **Environment Setup**
+- Single responsibility per service.
+- Each service owns its data and schema.
+- Contracts are explicit and versioned.
+- Prefer async events for cross-service side effects.
+- Security, audit, and observability are first-class.
 
-   * Install JDK 17+
-   * Install IntelliJ / VSCode
-   * Install Docker
-   * Install PostgreSQL locally
-   * Install Git
+## Microservices Overview
 
-2. **Core Java Learning**
+- **Gateway**: Entry point, routing, TLS termination, rate limits, auth enforcement.
+- **Auth**: Identity, JWT issuance, refresh tokens, email verification, login audit.
+- **User**: User profile and preferences, separate from auth.
+- **Team**: Teams, memberships, roles, invitations.
+- **Workflow**: Workflow definitions, steps, approvals, and state transitions.
+- **Asset**: Asset metadata, ownership, classification, versioning.
+- **Encryption**: Key management, encryption policies, decrypt approvals.
+- **Tools**: Tool catalog, tool configs, tool execution metadata.
+- **Notification**: Email, SMS, in-app notifications, templates.
+- **Audit**: Centralized security and compliance logs.
+- **Search**: Indexing and semantic search across assets and tasks.
+- **Integration**: Webhooks, third-party connectors, inbound events.
+- **Billing**: Plans, quotas, usage metering.
+- **Analytics**: Usage analytics, dashboards, KPIs.
 
-   * OOP: classes, inheritance, polymorphism
-   * Collections: List, Map, Set
-   * Exception handling
-   * Streams & Lambda
-   * Java 8+ features
+## Data Ownership
 
-3. **Spring Boot Basics**
+- Auth owns credentials, refresh tokens, OTPs.
+- User owns profile data, preferences.
+- Team owns org structures and membership.
+- Workflow owns workflow states and approvals.
+- Asset owns asset metadata and lineage.
+- Encryption owns keys, policies, and rotation history.
+- Audit stores immutable security events.
 
-   * Create basic Spring Boot project
-   * Understand `@SpringBootApplication`, `@RestController`, `@Service`, `@Repository`
-   * Build your first REST API (e.g., “Hello World” endpoint)
+## Phase 1 — Core Platform
 
-4. **Database Basics**
+**Scope**
+- Auth service and Gateway.
+- User and Team services.
+- Basic audit logging.
 
-   * Setup PostgreSQL
-   * Create simple tables
-   * Learn basic CRUD SQL
-   * Connect Spring Boot to PostgreSQL using Spring Data JPA
+**Deliverable**
+- Working authentication, user profiles, team membership, and secure API entry.
 
-5. **Version Control**
+## Phase 2 — Collaboration Backbone
 
-   * Git commit/push/pull
-   * Git branching
+**Scope**
+- Workflow service.
+- Asset service (metadata only).
+- Notification service.
 
-**Deliverable:**
+**Deliverable**
+- End-to-end workflow execution on asset metadata with notifications.
 
-* Simple Spring Boot project with REST endpoints and PostgreSQL integration.
+## Phase 3 — Security & Compliance
 
----
+**Scope**
+- Encryption service with key management.
+- Audit service with immutable logs.
+- Policy enforcement in Gateway and Workflow.
 
-# **Phase 1 — Junior Level (Core Platform)**
+**Deliverable**
+- Policy-driven workflows and auditable security events.
 
-**Goal:** Build the foundation of the system with **basic user, team, project, and task management**.
+## Phase 4 — Productivity & Extensibility
 
-**Modules & Features:**
+**Scope**
+- Tools service and Integration service.
+- Search service for fast discovery.
 
-1. **Authentication & Users**
+**Deliverable**
+- Tool-driven workflows, external integrations, and platform-wide search.
 
-   * User entity: id, name, email, password
-   * JWT-based authentication
-   * Registration & login endpoints
-   * Password hashing
+## Phase 5 — Scale & Intelligence
 
-2. **Team Management**
+**Scope**
+- Analytics service.
+- Billing service.
+- Performance, reliability, and SLOs.
 
-   * Create, read, update, delete teams
-   * Assign users to teams
-   * Team roles (Admin, Member)
+**Deliverable**
+- Usage visibility, monetization, and scalable operations.
 
-3. **Project Management**
+## Cross-Cutting Platform Work
 
-   * CRUD Projects
-   * Assign projects to teams
-   * Project statuses (Active, Completed)
-
-4. **Task Management**
-
-   * CRUD Tasks
-   * Assign tasks to users
-   * Task statuses (To Do, In Progress, Done)
-   * Simple priority field (Low, Medium, High)
-
-5. **Basic API Layer**
-
-   * Implement RESTful endpoints
-   * Validate requests
-   * Handle exceptions globally
-
-6. **Basic Logging**
-
-   * Add SLF4J / Logback logging
-
-**Deliverable:**
-
-* A minimal **collaboration backend** with users, teams, projects, tasks, JWT authentication.
-
----
-
-# **Phase 2 — Mid Level (Product, Workflow, and Asset Metadata)**
-
-**Goal:** Add **product management, workflow, and metadata-based asset handling**.
-
-**Modules & Features:**
-
-1. **Product Management**
-
-   * CRUD products
-   * Assign products to projects
-   * Manage product features and releases
-   * Product status tracking
-
-2. **Asset Metadata**
-
-   * Asset entity: id, name, hash, classification, owner
-   * CRUD metadata only (no P2P yet)
-   * Associate assets with projects, tasks, products
-
-3. **Workflow Engine**
-
-   * Define workflows: steps, approvals
-   * Start workflow instance per asset
-   * Track workflow step status
-
-4. **Basic Notifications**
-
-   * Email or in-app notification for workflow steps
-   * Kafka optional for event streaming (start simple)
-
-5. **RBAC Security**
-
-   * Define roles: Admin, Manager, Member, Viewer
-   * Assign permissions to roles
-   * Protect endpoints using Spring Security roles
-
-**Deliverable:**
-
-* Fully functional **mid-level backend** supporting projects, products, tasks, workflows, and asset metadata with RBAC.
-
----
-
-# **Phase 3 — Senior Level (Advanced Security + P2P Asset Storage + ABAC)**
-
-**Goal:** Add **advanced security, distributed storage, and ABAC policies**.
-
-**Modules & Features:**
-
-1. **P2P Asset Storage**
-
-   * Integrate IPFS or similar decentralized storage
-   * Upload assets → receive hash → store metadata in DB
-   * Support asset retrieval via hash
-
-2. **ABAC Security**
-
-   * User attributes: department, clearance
-   * Asset attributes: classification, owner, department
-   * Define policies like:
-
-     ```
-     user.department == asset.department
-     AND user.clearance >= asset.classification
-     ```
-   * Integrate policy engine into endpoints
-
-3. **Asset Versioning**
-
-   * Track versions for assets
-   * Maintain historical records
-
-4. **Workflow Enhancements**
-
-   * Conditional workflow steps based on ABAC policies
-   * Workflow notifications via events
-
-5. **Audit Logging**
-
-   * Log asset access, updates, deletions
-   * Include timestamps, user, IP
-
-6. **Advanced Security Features**
-
-   * Encrypt assets before uploading (AES-256)
-   * Secure token-based access
-   * Rate limiting for APIs
-
-**Deliverable:**
-
-* A **secure enterprise-level backend** with distributed assets, ABAC, versioning, and audit logs.
-
----
-
-# **Phase 4 — Advanced Level (AI Integration + Cloud + Observability)**
-
-**Goal:** Build **AI-powered features, cloud deployment, and monitoring**.
-
-**Modules & Features:**
-
-1. **AI Task & Project Assistant**
-
-   * Suggest tasks based on project description
-   * Predict project delays or high-risk tasks
-   * Auto-prioritize tasks
-
-2. **AI Document/Asset Intelligence**
-
-   * Auto-tag uploaded assets
-   * Summarize documents
-   * Detect sensitive content
-
-3. **AI Semantic Search**
-
-   * Vector embedding of tasks, assets, documents
-   * Search by meaning rather than keywords
-
-4. **Cloud Deployment**
-
-   * Containerize services with Docker
-   * Deploy microservices on Kubernetes
-   * Use cloud DB and storage (AWS S3, GCP Storage)
-
-5. **Caching & Optimization**
-
-   * Redis for frequently accessed data
-   * API response caching
-   * Asset metadata caching
-
-6. **Monitoring & Observability**
-
-   * Prometheus + Grafana dashboards
-   * Track service health, API latency, error rates
-   * Alerting on failures
-
-7. **Event-Driven Architecture**
-
-   * Kafka topics for:
-
-     * task_created
-     * workflow_step_completed
-     * asset_uploaded
-   * Consumers handle notifications, analytics, and audit logs
-
-**Deliverable:**
-
-* A **full-scale cloud-native, AI-powered collaboration and asset management platform** ready for enterprise usage.
-
----
-
-# **Phase 5 — Optional Future Enhancements**
-
-* Blockchain-based asset verification
-* Real-time collaborative editing
-* Automated compliance auditing
-* AI predictive workflow automation
-* Multi-cloud deployment for redundancy
-
----
-
-# **Roadmap Summary Table**
-
-| Level             | Duration  | Features / Tasks                                                                         | Deliverable                                 |
-| ----------------- | --------- | ---------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Junior Foundation | 2 weeks   | Core Java, Spring Boot setup, DB CRUD, REST API                                          | Minimal working Spring Boot project         |
-| Junior            | 4 weeks   | Auth, Users, Teams, Projects, Tasks                                                      | Basic collaboration backend                 |
-| Mid               | 4-6 weeks | Product module, Workflow engine, Asset metadata, RBAC                                    | Fully functional mid-level backend          |
-| Senior            | 6 weeks   | P2P asset storage, ABAC, Asset versioning, Encryption, Audit logs                        | Secure enterprise backend                   |
-| Advanced          | 8 weeks   | AI assistant, AI document intelligence, semantic search, cloud deployment, observability | Cloud-native AI-powered enterprise platform |
-
-
-
+- CI/CD pipelines and environment promotion.
+- Secrets management and config policy.
+- Observability with logs, metrics, traces.
+- Data retention, backup, and disaster recovery.
+- Security scanning and dependency management.

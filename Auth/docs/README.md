@@ -286,6 +286,46 @@ From `Auth/`:
 mvn clean spring-boot:run
 ```
 
+## Docker & Docker Compose
+
+This service is containerized and runs with MySQL via Docker Compose.
+
+**What runs**
+- `auth-db` (MySQL 8.0) with a persistent Docker volume.
+- `auth-service` (Spring Boot) built from `Auth/Dockerfile`.
+
+**How it works**
+- `auth-service` connects to `auth-db` using the internal Docker network.
+- DB credentials are provided via environment variables.
+- Healthchecks ensure MySQL is ready before the app starts.
+
+**Run with Docker Compose (recommended)**
+From the repo root:
+```
+docker compose up --build
+```
+
+**Stop**
+```
+docker compose down
+```
+
+**Ports**
+- API: `http://localhost:8080`
+- MySQL host port: `3307` (container port `3306`)
+
+**Swagger UI**
+- `http://localhost:8080/swagger-ui/index.html`
+
+**Environment file**
+The compose file loads:
+- `Auth/.env` for SMTP and JWT secrets
+
+Make sure these values are present in `Auth/.env`:
+- `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `DB_SCHEMA`
+- `JWT_SECRET`, `JWT_ISSUER`
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`
+
 ## When To Use This Service
 
 Use when:
