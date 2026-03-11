@@ -1,52 +1,89 @@
 # Auth Service Documentation
 
-This document describes the current **Auth** service implementation: what it does, how it works, and how/when to use it. The service is intentionally **non‑JWT**. It provides signup, login, and password change flows using database‑backed credentials and Argon2 password hashing.
+This document describes the **Auth** microservice: architecture, responsibilities, API surface, and why each part exists.
 
-## What This Service Is For
+## Architecture And Microservice View
 
-Use this service when you need:
-- **Account creation** with hashed password storage.
-- **Credential verification** (email + password) without JWT issuance.
-- **Account state checks** (locked, email verified).
-- **Audit logging** of entity changes.
+**Deployment context**
+- This service is designed to sit behind an API Gateway and/or Nginx.
+- TLS terminates at the gateway or load balancer.
+- The service itself runs HTTP internally.
 
-It is **not** responsible for:
-- JWT access/refresh token creation or validation.
-- Authorization beyond basic authenticated/unauthenticated separation.
-- Social login or external identity providers.
+**High-level flow**
+```
+Client → API Gateway / Nginx → Auth Service → MySQL
+                           ↘→ SMTP Provider
+```
 
-## Where It’s Used
+**What this service owns**
+- User authentication (email + password).
+- JWT token issuance and validation.
+- Refresh token lifecycle (issue, rotate, revoke).
+- Email OTP verification for email ownership.
+- Audit logging for security-critical actions.
 
-It is designed as a standalone auth module that can be called by:
-- A web or mobile frontend for signup/login/password change.
-- Other services in a monolith or microservice setup that need credential verification.
+**What this service does not own**
+- Frontend UI.
+- API Gateway routing and TLS.
+- Authorization across other services.
+- OAuth or social login.
 
-Base path for endpoints:
-- `/auth`
+## Why This Exists
 
-OpenAPI / Swagger UI:
-- `/swagger-ui.html`
+- Centralizes authentication logic and secrets in one place.
+- Provides a clean contract for other services via JWT.
+- Adds auditability for security and compliance.
+- Encapsulates email verification flow and rate limits.
 
-## How It Works (Current Flow)
+## Core Components And Responsibilities
 
-### Signup
-1. `AuthController` receives request.
-2. `UserAuthService.registerUser()` checks for existing email.
-3. Password is hashed using **Argon2**.
-4. `UserAuthRepository` persists the new user.
+**Controller → Service → Repository**
+- `AuthController` handles HTTP and returns `GenericResponse`.
+- `UserAuthService` manages user lifecycle and password change.
+- `AuthenticationManager` orchestrates authentication and token flows.
+- `AuthenticationProvider` verifies credentials and loads users.
+- `AuthenticationVerifier` enforces account state rules.
+- `JwtService` issues and validates JWTs.
+- `RefreshTokenService` persists refresh tokens and handles rotation.
+- `EmailOtpService` manages OTP generation, verification, and rate limits.
+- `AuditLogService` records audit events.
 
-### Login
-1. `AuthController` receives credentials.
-2. `AuthenticationManager` orchestrates the flow:
-   - `AuthenticationProvider` loads user and verifies password.
-   - `AuthenticationVerifier` enforces account rules (locked, email verified).
-3. Returns sanitized `UserCredentials` (no password).
+## How It Works (Key Flows)
 
-### Change Password
-1. `AuthController` receives userId + new password.
-2. `UserAuthService.changePassword()` hashes and saves the new password.
+**Signup**
+1. User registers with email + password.
+2. Password is hashed with Argon2.
+3. User is stored in `user_auth`.
+4. JWT tokens are returned.
+5. Audit log is recorded.
+
+**Login**
+1. Credentials validated by `AuthenticationProvider`.
+2. Account state validated by `AuthenticationVerifier`.
+3. JWT tokens returned.
+4. Audit log recorded.
+
+**JWT Access**
+1. `JwtAuthenticationFilter` extracts Bearer token.
+2. `AuthenticationManager.authenticateJwtAccess(...)` validates token.
+3. User is loaded and account verified.
+
+**Refresh Tokens**
+1. Refresh token validated and looked up in DB.
+2. Old refresh token revoked.
+3. New access + refresh tokens issued.
+4. Audit log recorded.
+
+**Email Verification (OTP)**
+1. OTP is generated and emailed.
+2. OTP is stored hashed with expiry, attempt limits, cooldown.
+3. Verification marks email as verified.
+4. Audit log recorded.
 
 ## API Endpoints
+
+Base path: `/auth`  
+Swagger UI: `/swagger-ui.html`
 
 ### `POST /auth/signup`
 Registers a new user.
@@ -64,12 +101,19 @@ Response:
 {
   "success": true,
   "data": {
-    "id": 1,
-    "email": "user@example.com",
-    "emailVerified": false,
-    "accountLocked": false,
-    "createdAt": "2026-03-11T00:00:00Z",
-    "updatedAt": "2026-03-11T00:00:00Z"
+    "user": {
+      "id": 1,
+      "email": "user@example.com",
+      "emailVerified": false,
+      "accountLocked": false,
+      "createdAt": "2026-03-11T00:00:00Z",
+      "updatedAt": "2026-03-11T00:00:00Z"
+    },
+    "accessToken": "jwt...",
+    "refreshToken": "jwt...",
+    "accessTokenExpiresIn": 900000,
+    "refreshTokenExpiresIn": 604800000,
+    "tokenType": "Bearer"
   },
   "msg": "User registered successfully"
 }
@@ -91,19 +135,77 @@ Response:
 {
   "success": true,
   "data": {
-    "id": 1,
-    "email": "user@example.com",
-    "emailVerified": false,
-    "accountLocked": false,
-    "createdAt": "2026-03-11T00:00:00Z",
-    "updatedAt": "2026-03-11T00:00:00Z"
+    "user": {
+      "id": 1,
+      "email": "user@example.com",
+      "emailVerified": false,
+      "accountLocked": false,
+      "createdAt": "2026-03-11T00:00:00Z",
+      "updatedAt": "2026-03-11T00:00:00Z"
+    },
+    "accessToken": "jwt...",
+    "refreshToken": "jwt...",
+    "accessTokenExpiresIn": 900000,
+    "refreshTokenExpiresIn": 604800000,
+    "tokenType": "Bearer"
   },
   "msg": "Login successful"
 }
 ```
 
+### `POST /auth/refresh`
+Refreshes access and refresh tokens (rotation).
+
+Request:
+```json
+{
+  "refreshToken": "..."
+}
+```
+
+### `POST /auth/logout`
+Revokes a refresh token.
+
+Request:
+```json
+{
+  "refreshToken": "..."
+}
+```
+
+### `POST /auth/verify-email/request`
+Sends OTP to the email address.
+
+Request:
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+### `POST /auth/verify-email/resend`
+Resends OTP, honoring cooldown and rate limits.
+
+Request:
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+### `POST /auth/verify-email/confirm`
+Verifies OTP and marks email as verified.
+
+Request:
+```json
+{
+  "email": "user@example.com",
+  "code": "123456"
+}
+```
+
 ### `PATCH /auth/users/{id}/password`
-Changes the password for a specific user.
+Changes user password and revokes refresh tokens.
 
 Request:
 ```json
@@ -112,58 +214,70 @@ Request:
 }
 ```
 
-Response:
-```json
-{
-  "success": true,
-  "data": null,
-  "msg": "Password changed successfully"
-}
-```
-
 ## Data Model
 
-### `UserAuth` (Primary auth entity)
-Fields:
-- `id`
-- `email`
-- `password` (Argon2 hash, never returned in API)
-- `emailVerified`
-- `accountLocked`
-- Auditing fields from `BaseEntity` (`createdAt`, `updatedAt`, etc.)
+**UserAuth**
+- `email`, `password`, `emailVerified`, `accountLocked`
+- Extends `BaseEntity` for auditing.
 
-Rules:
-- Passwords **must be hashed** before persisting.
-- Email format is validated.
+**RefreshToken**
+- Stores refresh token with expiry and revocation status.
 
-### Auditing
-All entities extending `BaseEntity` are audited using `EntityAuditListener`.  
-Audit logs are written to the `audit_log` table via `AuditLogService`.
+**EmailOtp**
+- Stores hashed OTP, expiry, attempts, cooldowns.
+
+**AuditLog**
+- Stores audit trail for all important actions.
 
 ## Security
 
-Configured in `SecurityConfig`:
 - Stateless sessions.
-- CSRF, form login, logout disabled.
-- `/auth/**` is public.
-- All other endpoints require authentication.
-
-Note: `InMemoryUserDetailsManager` is used as a placeholder to prevent default generated credentials. Replace it when integrating a real authenticated area.
+- JWT Bearer tokens for protected endpoints.
+- Argon2 password hashing.
+- Email OTP for email verification.
+- Rate limiting per IP + method + path.
 
 ## Database & Migrations
 
-Uses **Flyway** for schema migrations:
-- `V1__create_users_table.sql`
+Flyway migrations:
+- `V1__create_user_auth_table.sql`
 - `V2__create_audit_table_logs.sql`
-- `V3__create_users_table_triggers.sql`
+- `V3__create_user_auth_triggers.sql` (MySQL-only location)
+- `V4__alter_audit_logs_nullable_entity_id.sql`
+- `V5__create_refresh_tokens_table.sql`
+- `V6__alter_audit_logs_action_length.sql`
+- `V7__create_email_otp_table.sql`
 
-Production DB settings are configured via `application.properties` and `.env`:
+## Configuration
+
+Database:
 - `DB_URL`
 - `DB_USERNAME`
 - `DB_PASSWORD`
 - `DB_SCHEMA`
 
-Tests use H2 (`application-test.properties`).
+JWT:
+- `JWT_SECRET`
+- `JWT_ISSUER`
+- `JWT_ACCESS_TOKEN_EXPIRATION_MS`
+- `JWT_REFRESH_TOKEN_EXPIRATION_MS`
+
+SMTP / Email OTP:
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USERNAME`
+- `SMTP_PASSWORD`
+- `SMTP_FROM`
+- `SMTP_USE_TLS`
+- `OTP_LENGTH`
+- `OTP_EXPIRY_MINUTES`
+- `OTP_MAX_SEND_PER_HOUR`
+- `OTP_MAX_VERIFY_ATTEMPTS`
+- `OTP_RESEND_COOLDOWN_SECONDS`
+
+Rate limiting:
+- `RATE_LIMIT_REQUESTS`
+- `RATE_LIMIT_WINDOW_SECONDS`
 
 ## Local Run
 
@@ -172,15 +286,14 @@ From `Auth/`:
 mvn clean spring-boot:run
 ```
 
-## When To Use This Project
+## When To Use This Service
 
-Use this Auth service when:
-- You want a basic, secure **email+password** auth flow.
-- You **do not** want JWT token issuance.
-- You need persistence + audit trails for user auth records.
+Use when:
+- You need email+password auth with JWT.
+- You want a centralized auth microservice.
+- You need audit logs for security events.
 
-Do **not** use it for:
-- OAuth/OIDC flows.
-- Multi‑factor authentication (not implemented).
-- Token‑based session management.
-
+Avoid when:
+- You need OAuth/OIDC or social logins.
+- You need MFA beyond email OTP.
+- You need a full user profile service. This focuses on auth only.
