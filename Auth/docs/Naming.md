@@ -6,3 +6,11 @@
 
 
 Controller → Service → Repository → DB
+
+
+
+| Component    | Responsibility                                  |
+| ------------ | ----------------------------------------------- |
+| AuthProvider | Fetch user credentials from a source            |
+| AuthVerifier | Verify credentials (password, token, OTP, etc.) |
+| AuthManager  | Orchestrates authentication logic               |

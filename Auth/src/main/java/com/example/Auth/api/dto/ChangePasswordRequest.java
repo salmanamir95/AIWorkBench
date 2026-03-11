@@ -8,4 +8,5 @@ public record ChangePasswordRequest(
         @Size(min = 8, max = 128)
         String newPassword
 ) {
+
 }
