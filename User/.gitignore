@@ -1,33 +1,58 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+### OS ###
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+### Editors / IDEs ###
+.vscode/
+.idea/
 *.iml
 *.ipr
+*.iws
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+.sts4-cache/
+.apt_generated
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+### Java / Maven / Gradle ###
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+*.war
+*.ear
+**/target/
+**/build/
+**/out/
+**/.gradle/
+**/bin/
 
-### VS Code ###
-.vscode/
+### Logs / Temp ###
+*.log
+logs/
+**/logs/
+*.tmp
+*.swp
+*~
+
+### Environment ###
+.env
+.env.*
+!.env.example
+
+### Node (if any frontend tooling appears) ###
+**/node_modules/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+### Coverage / Reports ###
+coverage/
+**/coverage/
+**/surefire-reports/
+**/failsafe-reports/
