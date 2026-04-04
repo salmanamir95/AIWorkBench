@@ -57,3 +57,6 @@ coverage/
 **/coverage/
 **/surefire-reports/
 **/failsafe-reports/
+
+
+.codex

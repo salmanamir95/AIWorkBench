@@ -20,4 +20,5 @@ pnpm-debug.log*
 
 ### Editor ###
 .vscode/
+.codex
 .idea/
