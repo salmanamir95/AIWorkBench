@@ -1,9 +1,0 @@
-target
-.git
-.idea
-.vscode
-*.iml
-*.log
-**/node_modules
-**/dist
-**/.DS_Store

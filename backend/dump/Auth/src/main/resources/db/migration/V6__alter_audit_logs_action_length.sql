@@ -1,2 +1,0 @@
-ALTER TABLE audit_logs
-    MODIFY action VARCHAR(50) NOT NULL;
