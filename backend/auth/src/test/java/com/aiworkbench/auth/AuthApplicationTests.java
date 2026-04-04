@@ -1,4 +1,4 @@
-package com.AIWorkBench.Auth;
+package com.aiworkbench.auth;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
