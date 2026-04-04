@@ -1,4 +1,4 @@
-package com.AIWorkBench.Auth;
+package com.aiworkbench.Auth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
