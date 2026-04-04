@@ -1,4 +1,4 @@
-package com.aiworkbench.Auth.config;
+package com.aiworkbench.auth.config;
 
 import org.springframework.context.annotation.Configuration;
 
