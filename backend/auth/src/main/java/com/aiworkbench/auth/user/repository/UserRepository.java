@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,17 +19,21 @@ public interface UserRepository extends JpaRepository<User,Long>{
 
     Optional<User> findByUsername(String username);
 
-    List<User> findByVerifiedTrue();
+    Page<User> findByVerifiedTrue(Pageable pageable);
     
-    List<User> findByVerifiedFalse();
+    Page<User> findByVerifiedFalse(Pageable pageable);
 
-    List<User> findByCreatedAtBefore(LocalDateTime time);
-    List<User> findByCreatedAtAfter(LocalDateTime time);
-    List<User> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    Page<User> findByCreatedAtBefore(LocalDateTime time, Pageable pageable);
+    Page<User> findByCreatedAtAfter(LocalDateTime time, Pageable pageable);
+    Page<User> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
+
 
     @Query("SELECT u.email FROM User u")
-    List<String> findAllEmails();
+    Page<String> findAllEmails(Pageable pageable);
 
     @Query("SELECT u.username FROM User u")
-    List<String> findAllUsernames();
+    Page<String> findAllUsernames(Pageable pageable);
+
+    boolean existsByEmail(String email);
+    boolean existsByUsername(String username);
 }

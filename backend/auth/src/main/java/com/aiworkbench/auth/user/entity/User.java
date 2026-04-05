@@ -11,6 +11,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Entity
 @Table(
@@ -51,8 +52,9 @@ public class User {
     @Column(name="updated_at", nullable=false)
     private LocalDateTime updatedAt;
 
+    @Builder.Default
     @Column(name="is_verified", nullable=false)
-    private Boolean isVerified = false;
+    private Boolean verified = false;
 
     @PrePersist
     protected void onCreate(){
