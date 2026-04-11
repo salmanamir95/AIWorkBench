@@ -37,7 +37,7 @@ public class Users extends Audit {
     private long id;
 
     @Column(name = "auth_id", nullable = false, unique=true, length=36)
-    private String auth_id;
+    private String authId;
 
     @Column(name = "name", nullable = false, length = 255)
     private String name;
