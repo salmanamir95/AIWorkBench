@@ -1,5 +1,5 @@
 CREATE TABLE Compensation (
-    id CHAR(36) PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
 
     salary DECIMAL(12,2) NOT NULL,
@@ -26,5 +26,12 @@ CREATE TABLE Compensation (
         CHECK (bonus >= 0),
 
     CONSTRAINT chk_date_range
-        CHECK (effective_to IS NULL OR effective_to > effective_from)
+        CHECK (effective_to IS NULL OR effective_to > effective_from),
+
+    INDEX idx_comp_effective_range (effective_from, effective_to),
+    INDEX idx_comp_effective_range_user (user_id, effective_from, effective_to),
+    INDEX idx_comp_effective_from (effective_from),
+    INDEX idx_comp_effective_from_user (user_id, effective_from)
+    INDEX idx_comp_salary (salary),
+    INDEX idx_comp_bonus (bonus)
 ) ENGINE=InnoDB;
