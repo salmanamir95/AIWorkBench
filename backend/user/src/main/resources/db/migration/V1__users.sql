@@ -5,4 +5,6 @@ CREATE TABLE users (
     dob DATE NOT NULL,
     createdAt DATETIME NOT NULL,
     updatedAt DATETIME NOT NULL
+    
+    INDEX idx_users_name (name)          -- add only if you query by name
 ) ENGINE=InnoDB;

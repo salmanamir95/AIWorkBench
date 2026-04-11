@@ -15,4 +15,8 @@ CREATE TABLE compensation (
     CONSTRAINT chk_salary_positive CHECK (salary > 0),
     CONSTRAINT chk_bonus_non_negative CHECK (bonus >= 0),
     CONSTRAINT chk_date_range CHECK (effective_to IS NULL OR effective_to > effective_from)
+
+     INDEX idx_comp_user_dates (user_id, effective_from, effective_to),
+    INDEX idx_comp_currency_from (currency, effective_from)  -- optional: payroll reporting
+
 ) ENGINE=InnoDB;
