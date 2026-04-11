@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
     private final UserRepository userRepository;
+
     public Users createUser(UserDTO user) {
         if (userRepository.existsByAuthId(user.getAuthId())) {
             throw new RuntimeException("AuthID already exists");
@@ -24,20 +25,22 @@ public class UserService {
         return userRepository.save(UserMapper.toEntity(user));
     }
 
-    public Users getByUserID(long id) {
-        return userRepository.findById(id)
+    public UserDTO getByUserID(long id) {
+        Users user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        return UserMapper.toDTO(user);
     }
 
-    public Page<Users> getAllUsers(Pageable page) {
-        return userRepository.findAll(page);
+    public Page<UserDTO> getAllUsers(Pageable page) {
+        return userRepository.findAll(page).map(UserMapper::toDTO);
     }
 
-    public Page<Users> searchByName(Pageable page, String name) {
-        return userRepository.searchByName(name, page);
+    public Page<UserDTO> searchByName(Pageable page, String name) {
+        return userRepository.searchByName(name, page).map(UserMapper::toDTO);
     }
 
-    public Users updateUser(Long id, UserDTO updatedUser) {
+    public UserDTO updateUser(Long id, UserDTO updatedUser) {
 
         Users existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
@@ -57,7 +60,15 @@ public class UserService {
         }
         existingUser.setDob(updatedUser.getDob());
 
-        return userRepository.save(existingUser);
+        return UserMapper.toDTO(userRepository.save(existingUser));
+    }
+
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found with id: " + id);
+        }
+
+        userRepository.deleteById(id);
     }
 
 }
