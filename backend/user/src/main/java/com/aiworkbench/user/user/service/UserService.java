@@ -17,12 +17,12 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public Users createUser(UserDTO user) {
+    public UserDTO createUser(UserDTO user) {
         if (userRepository.existsByAuthId(user.getAuthId())) {
             throw new RuntimeException("AuthID already exists");
         }
 
-        return userRepository.save(UserMapper.toEntity(user));
+        return UserMapper.toDTO(userRepository.save(UserMapper.toEntity(user)));
     }
 
     public UserDTO getByUserID(long id) {
