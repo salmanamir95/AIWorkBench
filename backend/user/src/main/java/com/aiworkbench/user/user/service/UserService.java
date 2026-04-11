@@ -4,7 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.aiworkbench.user.user.dto.UserDTO;
 import com.aiworkbench.user.user.entity.Users;
+import com.aiworkbench.user.user.mapper.UserMapper;
 import com.aiworkbench.user.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -14,13 +16,12 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
     private final UserRepository userRepository;
-
-    public Users createUser(Users user) {
+    public Users createUser(UserDTO user) {
         if (userRepository.existsByAuthId(user.getAuthId())) {
             throw new RuntimeException("AuthID already exists");
         }
 
-        return userRepository.save(user);
+        return userRepository.save(UserMapper.toEntity(user));
     }
 
     public Users getByUserID(long id) {
@@ -36,7 +37,7 @@ public class UserService {
         return userRepository.searchByName(name, page);
     }
 
-    public Users updateUser(Long id, Users updatedUser) {
+    public Users updateUser(Long id, UserDTO updatedUser) {
 
         Users existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
@@ -54,6 +55,7 @@ public class UserService {
 
             existingUser.setAuthId(updatedUser.getAuthId());
         }
+        existingUser.setDob(updatedUser.getDob());
 
         return userRepository.save(existingUser);
     }
