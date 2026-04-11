@@ -14,7 +14,7 @@ public interface UserRepository extends JpaRepository<Users, Long> {
     // IMPORTANT: names are not unique → return multiple results
     Page<Users> findByName(String name, Pageable pageable);
 
-    List<Users> findAllByName(String name);
+    Page<Users> findAllByName(String name);
 
     Optional<Users> findByAuthId(String authId);
 
