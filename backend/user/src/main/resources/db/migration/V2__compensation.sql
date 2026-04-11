@@ -31,7 +31,7 @@ CREATE TABLE Compensation (
     INDEX idx_comp_effective_range (effective_from, effective_to),
     INDEX idx_comp_effective_range_user (user_id, effective_from, effective_to),
     INDEX idx_comp_effective_from (effective_from),
-    INDEX idx_comp_effective_from_user (user_id, effective_from)
+    INDEX idx_comp_effective_from_user (user_id, effective_from),
     INDEX idx_comp_salary (salary),
     INDEX idx_comp_bonus (bonus)
 ) ENGINE=InnoDB;
