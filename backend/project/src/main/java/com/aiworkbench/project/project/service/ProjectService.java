@@ -7,10 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.aiworkbench.project.activity.dto.ProjectActivityLogDTO;
-import com.aiworkbench.project.activity.entity.ProjectActivityLog;
-import com.aiworkbench.project.activity.mapper.ProjectActivityLogMapper;
-import com.aiworkbench.project.activity.repository.ProjectActivityLogRepository;
+import com.aiworkbench.project.activity.service.ProjectActivityLogService;
 import com.aiworkbench.project.member.dto.ProjectMemberDTO;
 import com.aiworkbench.project.member.entity.ProjectMember;
 import com.aiworkbench.project.member.entity.ProjectRole;
@@ -36,7 +33,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final ProjectSettingsRepository projectSettingsRepository;
-    private final ProjectActivityLogRepository projectActivityLogRepository;
+    private final ProjectActivityLogService projectActivityLogService;
 
     @Transactional
     public ProjectDTO createProject(ProjectDTO dto, ProjectSettingsDTO settingsDTO) {
@@ -62,7 +59,7 @@ public class ProjectService {
                 .build();
         projectMemberRepository.save(owner);
 
-        logActivity(saved, saved.getOwnerId(), "PROJECT_CREATED", "Project created");
+        projectActivityLogService.logActivity(saved, saved.getOwnerId(), "PROJECT_CREATED", "Project created");
         return ProjectMapper.toDTO(saved);
     }
 
@@ -81,7 +78,7 @@ public class ProjectService {
         }
 
         Project saved = projectRepository.save(project);
-        logActivity(saved, project.getOwnerId(), "PROJECT_UPDATED", "Project updated");
+        projectActivityLogService.logActivity(saved, project.getOwnerId(), "PROJECT_UPDATED", "Project updated");
         return ProjectMapper.toDTO(saved);
     }
 
@@ -90,7 +87,7 @@ public class ProjectService {
         Project project = getProjectEntity(projectId);
         project.setStatus(ProjectStatus.DELETED);
         projectRepository.save(project);
-        logActivity(project, project.getOwnerId(), "PROJECT_DELETED", "Project deleted");
+        projectActivityLogService.logActivity(project, project.getOwnerId(), "PROJECT_DELETED", "Project deleted");
     }
 
     public ProjectDTO getProjectById(Long projectId) {
@@ -112,7 +109,7 @@ public class ProjectService {
 
         ProjectMember member = ProjectMemberMapper.toEntity(dto, project);
         ProjectMember saved = projectMemberRepository.save(member);
-        logActivity(project, dto.getUserId(), "MEMBER_ADDED", "Member added to project");
+        projectActivityLogService.logActivity(project, dto.getUserId(), "MEMBER_ADDED", "Member added to project");
         return ProjectMemberMapper.toDTO(saved);
     }
 
@@ -122,7 +119,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
         projectMemberRepository.delete(member);
-        logActivity(member.getProject(), userId, "MEMBER_REMOVED", "Member removed from project");
+        projectActivityLogService.logActivity(member.getProject(), userId, "MEMBER_REMOVED", "Member removed from project");
     }
 
     @Transactional
@@ -136,18 +133,13 @@ public class ProjectService {
 
         member.setProjectRole(role);
         ProjectMember saved = projectMemberRepository.save(member);
-        logActivity(member.getProject(), userId, "ROLE_CHANGED", "Project role changed");
+        projectActivityLogService.logActivity(member.getProject(), userId, "ROLE_CHANGED", "Project role changed");
         return ProjectMemberMapper.toDTO(saved);
     }
 
     public Page<ProjectMemberDTO> getProjectMembers(Long projectId, Pageable pageable) {
         return projectMemberRepository.findByProjectId(projectId, pageable)
                 .map(ProjectMemberMapper::toDTO);
-    }
-
-    public Page<ProjectActivityLogDTO> getProjectActivityLog(Long projectId, Pageable pageable) {
-        return projectActivityLogRepository.findByProjectIdOrderByCreatedAtDesc(projectId, pageable)
-                .map(ProjectActivityLogMapper::toDTO);
     }
 
     public ProjectSettingsDTO getProjectSettings(Long projectId) {
@@ -167,14 +159,8 @@ public class ProjectService {
         settings.setAllowGuestAccess(dto.isAllowGuestAccess());
 
         ProjectSettings saved = projectSettingsRepository.save(settings);
-        logActivity(settings.getProject(), settings.getProject().getOwnerId(), "SETTINGS_UPDATED", "Project settings updated");
+        projectActivityLogService.logActivity(settings.getProject(), settings.getProject().getOwnerId(), "SETTINGS_UPDATED", "Project settings updated");
         return ProjectSettingsMapper.toDTO(saved);
-    }
-
-    public List<ProjectActivityLogDTO> getProjectActivityLog(Long projectId) {
-        return projectActivityLogRepository.findByProjectIdOrderByCreatedAtDesc(projectId, Pageable.unpaged())
-                .map(ProjectActivityLogMapper::toDTO)
-                .getContent();
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -208,13 +194,4 @@ public class ProjectService {
         }
     }
 
-    private void logActivity(Project project, Long userId, String action, String details) {
-        ProjectActivityLog log = ProjectActivityLog.builder()
-                .project(project)
-                .userId(userId != null ? userId : project.getOwnerId())
-                .action(action)
-                .details(details)
-                .build();
-        projectActivityLogRepository.save(log);
-    }
 }

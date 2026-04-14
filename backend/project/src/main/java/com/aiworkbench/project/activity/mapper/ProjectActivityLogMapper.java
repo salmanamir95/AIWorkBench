@@ -10,8 +10,6 @@ public class ProjectActivityLogMapper {
         if (entity == null) return null;
 
         return ProjectActivityLogDTO.builder()
-                .id(entity.getId())
-                .projectId(entity.getProject().getId())
                 .userId(entity.getUserId())
                 .action(entity.getAction())
                 .details(entity.getDetails())
@@ -23,7 +21,6 @@ public class ProjectActivityLogMapper {
         if (dto == null) return null;
 
         return ProjectActivityLog.builder()
-                .id(dto.getId())
                 .project(project)
                 .userId(dto.getUserId())
                 .action(dto.getAction())

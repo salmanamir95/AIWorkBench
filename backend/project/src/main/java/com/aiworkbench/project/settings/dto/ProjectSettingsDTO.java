@@ -15,8 +15,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProjectSettingsDTO {
 
-    private Long id;
-    private Long projectId;
     private ProjectVisibility visibility;
     private boolean allowGuestAccess;
 }

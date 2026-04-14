@@ -17,7 +17,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProjectMemberDTO {
 
-    private Long id;
     private Long projectId;
     private Long userId;
     private ProjectRole projectRole;

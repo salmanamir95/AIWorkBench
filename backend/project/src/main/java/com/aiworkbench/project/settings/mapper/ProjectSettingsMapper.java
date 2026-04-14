@@ -10,8 +10,6 @@ public class ProjectSettingsMapper {
         if (entity == null) return null;
 
         return ProjectSettingsDTO.builder()
-                .id(entity.getId())
-                .projectId(entity.getProject().getId())
                 .visibility(entity.getVisibility())
                 .allowGuestAccess(entity.isAllowGuestAccess())
                 .build();
@@ -21,7 +19,6 @@ public class ProjectSettingsMapper {
         if (dto == null) return null;
 
         return ProjectSettings.builder()
-                .id(dto.getId())
                 .project(project)
                 .visibility(dto.getVisibility())
                 .allowGuestAccess(dto.isAllowGuestAccess())

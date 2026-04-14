@@ -15,8 +15,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProjectActivityLogDTO {
 
-    private Long id;
-    private Long projectId;
     private Long userId;
     private String action;
     private String details;

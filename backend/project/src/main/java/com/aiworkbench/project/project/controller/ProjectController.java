@@ -14,13 +14,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aiworkbench.project.activity.dto.ProjectActivityLogDTO;
+import com.aiworkbench.project.activity.service.ProjectActivityLogService;
 import com.aiworkbench.project.gr.GR;
 import com.aiworkbench.project.member.dto.ProjectMemberDTO;
 import com.aiworkbench.project.member.entity.ProjectRole;
+import com.aiworkbench.project.member.service.ProjectMemberService;
 import com.aiworkbench.project.project.dto.ProjectCreateRequest;
 import com.aiworkbench.project.project.dto.ProjectDTO;
 import com.aiworkbench.project.project.service.ProjectService;
 import com.aiworkbench.project.settings.dto.ProjectSettingsDTO;
+import com.aiworkbench.project.settings.service.ProjectSettingsService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +33,9 @@ import lombok.RequiredArgsConstructor;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final ProjectMemberService projectMemberService;
+    private final ProjectSettingsService projectSettingsService;
+    private final ProjectActivityLogService projectActivityLogService;
 
     @PostMapping
     public ResponseEntity<GR<ProjectDTO>> createProject(
@@ -77,7 +83,7 @@ public class ProjectController {
             @PathVariable Long id,
             @RequestBody ProjectMemberDTO member
     ) {
-        ProjectMemberDTO added = projectService.addMemberToProject(id, member);
+        ProjectMemberDTO added = projectMemberService.addMemberToProject(id, member);
         return ResponseEntity.ok(GR.success(added, "Member added successfully"));
     }
 
@@ -86,7 +92,7 @@ public class ProjectController {
             @PathVariable Long id,
             @PathVariable Long userId
     ) {
-        projectService.removeMemberFromProject(id, userId);
+        projectMemberService.removeMemberFromProject(id, userId);
         return ResponseEntity.ok(GR.success(null, "Member removed successfully"));
     }
 
@@ -96,7 +102,7 @@ public class ProjectController {
             @PathVariable Long userId,
             @RequestParam ProjectRole role
     ) {
-        ProjectMemberDTO updated = projectService.changeProjectRole(id, userId, role);
+        ProjectMemberDTO updated = projectMemberService.changeProjectRole(id, userId, role);
         return ResponseEntity.ok(GR.success(updated, "Project role updated successfully"));
     }
 
@@ -105,7 +111,7 @@ public class ProjectController {
             @PathVariable Long id,
             Pageable pageable
     ) {
-        Page<ProjectMemberDTO> members = projectService.getProjectMembers(id, pageable);
+        Page<ProjectMemberDTO> members = projectMemberService.getProjectMembers(id, pageable);
         return ResponseEntity.ok(GR.success(members, "Project members fetched successfully"));
     }
 
@@ -114,13 +120,13 @@ public class ProjectController {
             @PathVariable Long id,
             Pageable pageable
     ) {
-        Page<ProjectActivityLogDTO> logs = projectService.getProjectActivityLog(id, pageable);
+        Page<ProjectActivityLogDTO> logs = projectActivityLogService.getProjectActivityLog(id, pageable);
         return ResponseEntity.ok(GR.success(logs, "Project activity fetched successfully"));
     }
 
     @GetMapping("/{id}/settings")
     public ResponseEntity<GR<ProjectSettingsDTO>> getSettings(@PathVariable Long id) {
-        ProjectSettingsDTO settings = projectService.getProjectSettings(id);
+        ProjectSettingsDTO settings = projectSettingsService.getProjectSettings(id);
         return ResponseEntity.ok(GR.success(settings, "Project settings fetched successfully"));
     }
 
@@ -129,7 +135,7 @@ public class ProjectController {
             @PathVariable Long id,
             @RequestBody ProjectSettingsDTO settings
     ) {
-        ProjectSettingsDTO updated = projectService.updateProjectSettings(id, settings);
+        ProjectSettingsDTO updated = projectSettingsService.updateProjectSettings(id, settings);
         return ResponseEntity.ok(GR.success(updated, "Project settings updated successfully"));
     }
 }

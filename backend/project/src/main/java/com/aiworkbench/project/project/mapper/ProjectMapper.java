@@ -9,7 +9,6 @@ public class ProjectMapper {
         if (entity == null) return null;
 
         return ProjectDTO.builder()
-                .id(entity.getId())
                 .name(entity.getName())
                 .description(entity.getDescription())
                 .ownerId(entity.getOwnerId())
@@ -23,7 +22,6 @@ public class ProjectMapper {
         if (dto == null) return null;
 
         return Project.builder()
-                .id(dto.getId())
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .ownerId(dto.getOwnerId())

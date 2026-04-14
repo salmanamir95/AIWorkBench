@@ -10,7 +10,6 @@ public class ProjectMemberMapper {
         if (entity == null) return null;
 
         return ProjectMemberDTO.builder()
-                .id(entity.getId())
                 .projectId(entity.getProject().getId())
                 .userId(entity.getUserId())
                 .projectRole(entity.getProjectRole())
@@ -22,7 +21,6 @@ public class ProjectMemberMapper {
         if (dto == null) return null;
 
         return ProjectMember.builder()
-                .id(dto.getId())
                 .project(project)
                 .userId(dto.getUserId())
                 .projectRole(dto.getProjectRole())
