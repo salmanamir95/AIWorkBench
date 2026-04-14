@@ -15,7 +15,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserDashboardDTO {
 
-    private Long userId;
     private String authId;
     private String name;
     private Date dob;

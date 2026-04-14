@@ -15,7 +15,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserAnalyticsDTO {
 
-    private Long userId;
     private String name;
     private Double averageRating;
     private Long totalReviews;

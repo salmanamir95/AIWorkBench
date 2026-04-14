@@ -13,7 +13,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TopRaterDTO {
 
-    private Long userId;
     private String name;
     private Long ratingsGiven;
 }

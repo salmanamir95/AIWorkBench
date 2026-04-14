@@ -25,6 +25,7 @@ import com.aiworkbench.user.userDashboard.dto.TopRaterDTO;
 import com.aiworkbench.user.userDashboard.dto.UserAnalyticsDTO;
 import com.aiworkbench.user.userDashboard.dto.UserDashboardDTO;
 import com.aiworkbench.user.userDashboard.dto.UserSummaryCardDTO;
+import com.aiworkbench.user.userDashboard.mapper.UserDashboardMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,46 +42,26 @@ public class UserDashboardService {
 
     public UserDashboardDTO getUserProfile(Long userId) {
         UserDTO user = userService.getByUserID(userId);
-        return UserDashboardDTO.builder()
-                .userId(userId)
-                .authId(user.getAuthId())
-                .name(user.getName())
-                .dob(user.getDob())
-                .build();
+        return UserDashboardMapper.toProfile(user);
     }
 
     public UserDashboardDTO getFullUserDashboard(Long userId) {
         UserDTO user = userService.getByUserID(userId);
-        return UserDashboardDTO.builder()
-                .userId(userId)
-                .authId(user.getAuthId())
-                .name(user.getName())
-                .dob(user.getDob())
-                .compensation(buildCompensationSummary(userId))
-                .reviews(buildReviewSummary(userId))
-                .build();
+        return UserDashboardMapper.toDashboard(
+                user,
+                buildCompensationSummary(userId),
+                buildReviewSummary(userId)
+        );
     }
 
     public UserDashboardDTO getUserWithReviews(Long userId) {
         UserDTO user = userService.getByUserID(userId);
-        return UserDashboardDTO.builder()
-                .userId(userId)
-                .authId(user.getAuthId())
-                .name(user.getName())
-                .dob(user.getDob())
-                .reviews(buildReviewSummary(userId))
-                .build();
+        return UserDashboardMapper.toDashboardWithReviews(user, buildReviewSummary(userId));
     }
 
     public UserDashboardDTO getUserWithCompensation(Long userId) {
         UserDTO user = userService.getByUserID(userId);
-        return UserDashboardDTO.builder()
-                .userId(userId)
-                .authId(user.getAuthId())
-                .name(user.getName())
-                .dob(user.getDob())
-                .compensation(buildCompensationSummary(userId))
-                .build();
+        return UserDashboardMapper.toDashboardWithCompensation(user, buildCompensationSummary(userId));
     }
 
     // ── Review Analytics ─────────────────────────────────────────────────────
@@ -103,11 +84,7 @@ public class UserDashboardService {
             ReviewsDTO dto = new ReviewsDTO();
             dto.setRaterId(user.getId());
             List<ReviewsDTO> given = reviewsService.getReviewsByRater(dto);
-            result.add(TopRaterDTO.builder()
-                    .userId(user.getId())
-                    .name(user.getName())
-                    .ratingsGiven((long) given.size())
-                    .build());
+            result.add(UserDashboardMapper.toTopRater(user.getName(), (long) given.size()));
         }
 
         result.sort(Comparator.comparing(TopRaterDTO::getRatingsGiven).reversed());
@@ -156,13 +133,12 @@ public class UserDashboardService {
         for (Users user : users) {
             try {
                 CompensationDTO current = compensationService.getCurrentByUser(user.getId());
-                result.add(LeaderboardDTO.builder()
-                        .userId(user.getId())
-                        .name(user.getName())
-                        .currentSalary(current.getSalary())
-                        .averageRating(null)
-                        .combinedScore(null)
-                        .build());
+                result.add(UserDashboardMapper.toLeaderboard(
+                        user.getName(),
+                        null,
+                        current.getSalary(),
+                        null
+                ));
             } catch (RuntimeException ignored) {
                 // no current compensation
             }
@@ -184,13 +160,12 @@ public class UserDashboardService {
 
         for (Users user : users) {
             Double avg = getAverageRating(user.getId());
-            result.add(LeaderboardDTO.builder()
-                    .userId(user.getId())
-                    .name(user.getName())
-                    .averageRating(avg)
-                    .currentSalary(null)
-                    .combinedScore(null)
-                    .build());
+            result.add(UserDashboardMapper.toLeaderboard(
+                    user.getName(),
+                    avg,
+                    null,
+                    null
+            ));
         }
 
         result.sort(Comparator.comparing(LeaderboardDTO::getAverageRating, Comparator.nullsLast(Comparator.naturalOrder())).reversed());
@@ -223,13 +198,12 @@ public class UserDashboardService {
             }
             double combined = calculateCombinedScore(avg, salary);
 
-            result.add(LeaderboardDTO.builder()
-                    .userId(user.getId())
-                    .name(user.getName())
-                    .averageRating(avg)
-                    .currentSalary(salary)
-                    .combinedScore(combined)
-                    .build());
+            result.add(UserDashboardMapper.toLeaderboard(
+                    user.getName(),
+                    avg,
+                    salary,
+                    combined
+            ));
         }
 
         result.sort(Comparator.comparing(LeaderboardDTO::getCombinedScore, Comparator.nullsLast(Comparator.naturalOrder())).reversed());
@@ -247,13 +221,7 @@ public class UserDashboardService {
             // no current compensation
         }
 
-        return UserSummaryCardDTO.builder()
-                .userId(userId)
-                .name(user.getName())
-                .averageRating(avg)
-                .totalReviews(totalReviews)
-                .currentSalary(salary)
-                .build();
+        return UserDashboardMapper.toSummaryCard(user, avg, totalReviews, salary);
     }
 
     // ── Advanced ─────────────────────────────────────────────────────────────
@@ -269,16 +237,13 @@ public class UserDashboardService {
             // no current compensation
         }
 
-        return UserAnalyticsDTO.builder()
-                .userId(userId)
-                .name(user.getName())
-                .averageRating(avg)
-                .totalReviews(totalReviews)
-                .currentSalary(current != null ? current.getSalary() : null)
-                .currentBonus(current != null ? current.getBonus() : null)
-                .currency(current != null ? current.getCurrency() : null)
-                .salaryGrowth(getSalaryGrowth(userId))
-                .build();
+        return UserDashboardMapper.toAnalytics(
+                user,
+                avg,
+                totalReviews,
+                current,
+                getSalaryGrowth(userId)
+        );
     }
 
     public SystemStatsDTO getSystemWideStats() {
@@ -337,13 +302,7 @@ public class UserDashboardService {
         for (Users user : users) {
             List<ReviewsDTO> reviews = getReviewsForUser(user.getId());
             if (reviews.isEmpty()) {
-                result.add(UserSummaryCardDTO.builder()
-                        .userId(user.getId())
-                        .name(user.getName())
-                        .averageRating(0.0)
-                        .totalReviews(0L)
-                        .currentSalary(null)
-                        .build());
+                result.add(UserDashboardMapper.toSummaryCard(userService.getByUserID(user.getId()), 0.0, 0L, null));
             }
         }
         return result;
@@ -356,13 +315,12 @@ public class UserDashboardService {
         for (Users user : users) {
             List<CompensationDTO> history = getCompensationHistory(user.getId());
             if (history.isEmpty()) {
-                result.add(UserSummaryCardDTO.builder()
-                        .userId(user.getId())
-                        .name(user.getName())
-                        .averageRating(getAverageRating(user.getId()))
-                        .totalReviews((long) getReviewsForUser(user.getId()).size())
-                        .currentSalary(null)
-                        .build());
+                result.add(UserDashboardMapper.toSummaryCard(
+                        userService.getByUserID(user.getId()),
+                        getAverageRating(user.getId()),
+                        (long) getReviewsForUser(user.getId()).size(),
+                        null
+                ));
             }
         }
         return result;

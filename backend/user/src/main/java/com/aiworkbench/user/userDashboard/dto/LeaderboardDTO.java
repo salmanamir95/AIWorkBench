@@ -15,7 +15,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LeaderboardDTO {
 
-    private Long userId;
     private String name;
     private Double averageRating;
     private BigDecimal currentSalary;
