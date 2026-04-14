@@ -6,38 +6,31 @@ import com.aiworkbench.user.user.entity.Users;
 
 public class CompensationMapper {
 
-    // =========================================================
-    // ENTITY -> DTO
-    // =========================================================
-    public static CompensationDTO toDTO(Compensation comp) {
-        if (comp == null) return null;
+    public static CompensationDTO toDTO(Compensation entity) {
+        if (entity == null) return null;
 
-        return CompensationDTO.builder()
-                .id(comp.getId())
-                .userId(comp.getUser() != null ? comp.getUser().getId() : null)
-                .salary(comp.getSalary())
-                .bonus(comp.getBonus())
-                .currency(comp.getCurrency())
-                .effectiveFrom(comp.getEffectiveFrom())
-                .effectiveTo(comp.getEffectiveTo())
-                .build();
+        CompensationDTO dto = new CompensationDTO();
+        dto.setUserId(entity.getUser().getId());
+        dto.setSalary(entity.getSalary());
+        dto.setBonus(entity.getBonus());
+        dto.setCurrency(entity.getCurrency());
+        dto.setEffectiveFrom(entity.getEffectiveFrom());
+        dto.setEffectiveTo(entity.getEffectiveTo());
+
+        return dto;
     }
 
-    // =========================================================
-    // DTO -> ENTITY
-    // NOTE: User must be set from DB in service layer
-    // =========================================================
     public static Compensation toEntity(CompensationDTO dto, Users user) {
         if (dto == null) return null;
 
-        return Compensation.builder()
-                .id(dto.getId())
-                .user(user)
-                .salary(dto.getSalary())
-                .bonus(dto.getBonus())
-                .currency(dto.getCurrency())
-                .effectiveFrom(dto.getEffectiveFrom())
-                .effectiveTo(dto.getEffectiveTo())
-                .build();
+        Compensation entity = new Compensation();
+        entity.setUser(user);
+        entity.setSalary(dto.getSalary());
+        entity.setBonus(dto.getBonus());
+        entity.setCurrency(dto.getCurrency());
+        entity.setEffectiveFrom(dto.getEffectiveFrom());
+        entity.setEffectiveTo(dto.getEffectiveTo());
+
+        return entity;
     }
 }

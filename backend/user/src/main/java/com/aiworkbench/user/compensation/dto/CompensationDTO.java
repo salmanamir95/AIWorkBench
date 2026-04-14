@@ -1,18 +1,17 @@
 package com.aiworkbench.user.compensation.dto;
 
-import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class CompensationDTO {
-
-    private Long id;
 
     private Long userId;
 

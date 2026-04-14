@@ -21,6 +21,8 @@ public interface CompensationRepository extends JpaRepository<Compensation, Long
 
     Page<Compensation> findByUserIdOrderByEffectiveFromDesc(Long userId, Pageable pageable);
 
+    Optional<Compensation> findByUserIdAndEffectiveFrom(Long userId, LocalDate effectiveFrom);
+
     // =========================================================
     // 2. RANGE QUERIES (ALL USERS / PAGINATED)
     // =========================================================
