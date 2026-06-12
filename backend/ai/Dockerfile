@@ -1,7 +1,6 @@
-FROM alpine:3.19
+FROM eclipse-temurin:26-jre-alpine
 
-# Install Java + bash
-RUN apk add --no-cache openjdk17 bash
+RUN apk add --no-cache bash
 
 WORKDIR /app
 COPY target/*.jar app.jar
