@@ -18,8 +18,31 @@ public class UserService {
     private final UserRepository userRepository;
 
     public UserDTO createUser(UserDTO user) {
-        if (userRepository.existsByAuthId(user.getAuthId())) {
-            throw new RuntimeException("AuthID already exists");
+        if (user.getId() != null) {
+            Users existingUser = userRepository.findById(user.getId())
+                    .orElseThrow(() -> new RuntimeException("Auth user not found with id: " + user.getId()));
+
+            existingUser.setName(user.getName());
+            existingUser.setDob(user.getDob());
+
+            return UserMapper.toDTO(userRepository.save(existingUser));
+        }
+
+        if (user.getUsername() == null || user.getUsername().isBlank()) {
+            throw new RuntimeException("Username is required when creating a user");
+        }
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new RuntimeException("Email is required when creating a user");
+        }
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new RuntimeException("Password is required when creating a user");
+        }
+
+        if (user.getUsername() != null && userRepository.existsByUsername(user.getUsername())) {
+            throw new RuntimeException("Username already exists");
+        }
+        if (user.getEmail() != null && userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email already exists");
         }
 
         return UserMapper.toDTO(userRepository.save(UserMapper.toEntity(user)));
@@ -45,20 +68,31 @@ public class UserService {
         Users existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
-        // Update only allowed fields
-        existingUser.setName(updatedUser.getName());
-
-        // Optional: handle authId carefully (usually shouldn't change)
-        if (updatedUser.getAuthId() != null
-                && !updatedUser.getAuthId().equals(existingUser.getAuthId())) {
-
-            if (userRepository.existsByAuthId(updatedUser.getAuthId())) {
-                throw new RuntimeException("AuthID already exists");
+        if (updatedUser.getUsername() != null
+                && !updatedUser.getUsername().equals(existingUser.getUsername())) {
+            if (userRepository.existsByUsername(updatedUser.getUsername())) {
+                throw new RuntimeException("Username already exists");
             }
-
-            existingUser.setAuthId(updatedUser.getAuthId());
+            existingUser.setUsername(updatedUser.getUsername());
         }
+
+        if (updatedUser.getEmail() != null
+                && !updatedUser.getEmail().equals(existingUser.getEmail())) {
+            if (userRepository.existsByEmail(updatedUser.getEmail())) {
+                throw new RuntimeException("Email already exists");
+            }
+            existingUser.setEmail(updatedUser.getEmail());
+        }
+
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            existingUser.setPassword(updatedUser.getPassword());
+        }
+
+        existingUser.setName(updatedUser.getName());
         existingUser.setDob(updatedUser.getDob());
+        if (updatedUser.getVerified() != null) {
+            existingUser.setVerified(updatedUser.getVerified());
+        }
 
         return UserMapper.toDTO(userRepository.save(existingUser));
     }

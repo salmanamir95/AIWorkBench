@@ -26,9 +26,12 @@ services:
   auth:
     build: ./auth
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/auth_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/users
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-aiworkbench}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-aiworkbench}
+      LOGGING_LEVEL_ROOT: DEBUG
+      LOGGING_LEVEL_ORG_HIBERNATE: DEBUG
+      LOGGING_LEVEL_ORG_FLYWAYDB: DEBUG
     depends_on:
       postgres:
         condition: service_healthy
@@ -66,7 +69,7 @@ services:
   user:
     build: ./user
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/user_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/users
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-aiworkbench}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-aiworkbench}
     depends_on:

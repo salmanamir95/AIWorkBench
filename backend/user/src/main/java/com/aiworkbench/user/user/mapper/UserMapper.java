@@ -9,9 +9,17 @@ public class UserMapper {
         if (dto == null) return null;
 
         Users user = new Users();
-        user.setAuthId(dto.getAuthId());
+        if (dto.getId() != null) {
+            user.setId(dto.getId());
+        }
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword());
         user.setName(dto.getName());
         user.setDob(dto.getDob());
+        if (dto.getVerified() != null) {
+            user.setVerified(dto.getVerified());
+        }
 
         return user;
     }
@@ -21,9 +29,12 @@ public class UserMapper {
         if (user == null) return null;
 
         UserDTO dto = new UserDTO();
-        dto.setAuthId(user.getAuthId());
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
         dto.setName(user.getName());
         dto.setDob(user.getDob());
+        dto.setVerified(user.getVerified());
 
         return dto;
     }

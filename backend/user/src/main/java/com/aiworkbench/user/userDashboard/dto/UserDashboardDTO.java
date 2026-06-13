@@ -1,6 +1,6 @@
 package com.aiworkbench.user.userDashboard.dto;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +15,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserDashboardDTO {
 
-    private String authId;
+    private Long id;
+    private String username;
+    private String email;
     private String name;
-    private Date dob;
+    private LocalDate dob;
     private CompensationSummaryDTO compensation;
     private ReviewSummaryDTO reviews;
 }

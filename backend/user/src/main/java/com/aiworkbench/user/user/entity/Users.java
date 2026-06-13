@@ -1,6 +1,6 @@
 package com.aiworkbench.user.user.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.aiworkbench.user.audit.Audit;
 
@@ -28,7 +28,9 @@ import lombok.Setter;
 @Table(
     name="users",
     indexes = {
-        @Index(name = "idx_users_name", columnList = "name")
+        @Index(name = "idx_users_name", columnList = "name"),
+        @Index(name = "idx_users_email", columnList = "email"),
+        @Index(name = "idx_users_username", columnList = "username")
     }
 )
 public class Users extends Audit {
@@ -36,13 +38,23 @@ public class Users extends Audit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "auth_id", nullable = false, unique=true, length=36)
-    private String authId;
+    @Column(name = "username", nullable = false, unique = true, length = 50)
+    private String username;
 
-    @Column(name = "name", nullable = false, length = 255)
+    @Column(name = "email", nullable = false, unique = true, length = 50)
+    private String email;
+
+    @Column(name = "password", nullable = false, length = 256)
+    private String password;
+
+    @Column(name = "name", length = 255)
     private String name;
 
-    @Column(name = "dob", nullable = false)
-    private Date dob;
+    @Column(name = "dob")
+    private LocalDate dob;
+
+    @Builder.Default
+    @Column(name = "is_verified", nullable = false)
+    private Boolean verified = false;
     
 }

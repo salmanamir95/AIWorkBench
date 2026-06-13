@@ -16,7 +16,9 @@ public class UserDashboardMapper {
 
     public static UserDashboardDTO toProfile(UserDTO user) {
         return UserDashboardDTO.builder()
-                .authId(user.getAuthId())
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
                 .name(user.getName())
                 .dob(user.getDob())
                 .build();
@@ -26,7 +28,9 @@ public class UserDashboardMapper {
                                                CompensationSummaryDTO compensation,
                                                ReviewSummaryDTO reviews) {
         return UserDashboardDTO.builder()
-                .authId(user.getAuthId())
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
                 .name(user.getName())
                 .dob(user.getDob())
                 .compensation(compensation)
@@ -36,7 +40,9 @@ public class UserDashboardMapper {
 
     public static UserDashboardDTO toDashboardWithReviews(UserDTO user, ReviewSummaryDTO reviews) {
         return UserDashboardDTO.builder()
-                .authId(user.getAuthId())
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
                 .name(user.getName())
                 .dob(user.getDob())
                 .reviews(reviews)
@@ -45,7 +51,9 @@ public class UserDashboardMapper {
 
     public static UserDashboardDTO toDashboardWithCompensation(UserDTO user, CompensationSummaryDTO compensation) {
         return UserDashboardDTO.builder()
-                .authId(user.getAuthId())
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
                 .name(user.getName())
                 .dob(user.getDob())
                 .compensation(compensation)

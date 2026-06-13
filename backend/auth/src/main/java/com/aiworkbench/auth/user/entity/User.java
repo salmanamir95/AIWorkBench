@@ -1,5 +1,6 @@
 package com.aiworkbench.auth.user.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -45,6 +46,12 @@ public class User {
 
     @Column(name="password", nullable=false, length = 256)
     private String password;
+
+    @Column(name = "name", length = 255)
+    private String name;
+
+    @Column(name = "dob")
+    private LocalDate dob;
 
     @Column(name="created_at", nullable=false, updatable=false)
     private LocalDateTime createdAt;

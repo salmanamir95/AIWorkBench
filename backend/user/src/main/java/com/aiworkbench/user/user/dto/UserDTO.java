@@ -1,6 +1,6 @@
 package com.aiworkbench.user.user.dto;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,10 +13,18 @@ import lombok.Setter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class UserDTO {
-    private String authId;
+    private Long id;
+
+    private String username;
+
+    private String email;
+
+    private String password;
 
     private String name;
 
-    private Date dob;
+    private LocalDate dob;
+
+    private Boolean verified;
     
 }
