@@ -1,37 +1,37 @@
-CREATE TABLE compensation (
-    id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL,
+-- CREATE TABLE compensation (
+--     id BIGSERIAL PRIMARY KEY,
+--     user_id BIGINT NOT NULL,
 
-    salary DECIMAL(12,2) NOT NULL,
-    bonus DECIMAL(12,2) DEFAULT 0,
+--     salary DECIMAL(12,2) NOT NULL,
+--     bonus DECIMAL(12,2) DEFAULT 0,
 
-    currency VARCHAR(3) NOT NULL,
+--     currency VARCHAR(3) NOT NULL,
 
-    effective_from DATE NOT NULL,
-    effective_to DATE DEFAULT NULL,
+--     effective_from DATE NOT NULL,
+--     effective_to DATE DEFAULT NULL,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_comp_user
-        FOREIGN KEY (user_id)
-        REFERENCES users(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
+--     CONSTRAINT fk_comp_user
+--         FOREIGN KEY (user_id)
+--         REFERENCES users(id)
+--         ON DELETE CASCADE
+--         ON UPDATE CASCADE,
 
-    CONSTRAINT chk_salary_positive
-        CHECK (salary > 0),
+--     CONSTRAINT chk_salary_positive
+--         CHECK (salary > 0),
 
-    CONSTRAINT chk_bonus_non_negative
-        CHECK (bonus >= 0),
+--     CONSTRAINT chk_bonus_non_negative
+--         CHECK (bonus >= 0),
 
-    CONSTRAINT chk_date_range
-        CHECK (effective_to IS NULL OR effective_to > effective_from)
-);
+--     CONSTRAINT chk_date_range
+--         CHECK (effective_to IS NULL OR effective_to > effective_from)
+-- );
 
-CREATE INDEX idx_comp_effective_range ON compensation (effective_from, effective_to);
-CREATE INDEX idx_comp_effective_range_user ON compensation (user_id, effective_from, effective_to);
-CREATE INDEX idx_comp_effective_from ON compensation (effective_from);
-CREATE INDEX idx_comp_effective_from_user ON compensation (user_id, effective_from);
-CREATE INDEX idx_comp_salary ON compensation (salary);
-CREATE INDEX idx_comp_bonus ON compensation (bonus);
+-- CREATE INDEX idx_comp_effective_range ON compensation (effective_from, effective_to);
+-- CREATE INDEX idx_comp_effective_range_user ON compensation (user_id, effective_from, effective_to);
+-- CREATE INDEX idx_comp_effective_from ON compensation (effective_from);
+-- CREATE INDEX idx_comp_effective_from_user ON compensation (user_id, effective_from);
+-- CREATE INDEX idx_comp_salary ON compensation (salary);
+-- CREATE INDEX idx_comp_bonus ON compensation (bonus);
