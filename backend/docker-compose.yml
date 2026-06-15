@@ -1,10 +1,12 @@
 services:
-  # Service Discovery Registry
   consul:
     image: hashicorp/consul:latest
+    container_name: consul
     command: agent -dev -client 0.0.0.0
     ports:
       - "8500:8500"
+    networks:
+      - ai-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8500/v1/status/leader"]
       interval: 10s
@@ -13,6 +15,7 @@ services:
 
   postgres:
     image: postgres:17-alpine
+    container_name: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-aiworkbench}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aiworkbench}
@@ -21,6 +24,8 @@ services:
       - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ai-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -30,28 +35,39 @@ services:
 
   gateway:
     build: ./gateway
+    container_name: gateway
     ports:
       - "8083:8080"
     environment:
       - SPRING_CLOUD_CONSUL_HOST=consul
+    networks:
+      - ai-network
     depends_on:
       consul:
-        condition: service_started
+        condition: service_healthy
 
   project:
     build: ./project
+    container_name: project
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/project_db
+      # Use the service name 'postgres' instead of 'localhost'
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-aiworkbench}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-aiworkbench}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-aiworkbench}
       SPRING_CLOUD_CONSUL_HOST: consul
+    networks:
+      - ai-network
     depends_on:
       postgres:
         condition: service_healthy
       consul:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "8084:8080"
 
 volumes:
   postgres_data:
+
+networks:
+  ai-network:
+    driver: bridge
