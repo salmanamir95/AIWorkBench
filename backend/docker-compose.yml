@@ -47,23 +47,23 @@ services:
       consul:
         condition: service_healthy
 
-  # project:
-  #   build: ./project
-  #   container_name: project
-  #   environment:
-  #     SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-aiworkbench}
-  #     SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-aiworkbench}
-  #     SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-aiworkbench}
-  #     SPRING_CLOUD_CONSUL_HOST: consul
-  #   networks:
-  #     - workbench-network
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     consul:
-  #       condition: service_healthy
-  #   ports:
-  #     - "8084:8080"
+  project:
+    build: ./project
+    container_name: project
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-aiworkbench}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-aiworkbench}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-aiworkbench}
+      SPRING_CLOUD_CONSUL_HOST: consul
+    networks:
+      - workbench-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+    ports:
+      - "8084:8080"
 
 volumes:
   postgres_data:

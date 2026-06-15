@@ -1,4 +1,4 @@
-package com.aiworkbench.config;
+package com.aiworkbench.gateway.config;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.cloud.gateway.route.RouteDefinition;
