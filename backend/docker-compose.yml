@@ -6,7 +6,7 @@ services:
     ports:
       - "8500:8500"
     networks:
-      - ai-network
+      - workbench-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8500/v1/status/leader"]
       interval: 10s
@@ -25,7 +25,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - ai-network
+      - workbench-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -40,34 +40,34 @@ services:
       - "8083:8080"
     environment:
       - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_DISCOVERY_ENABLED=true
     networks:
-      - ai-network
+      - workbench-network
     depends_on:
       consul:
         condition: service_healthy
 
-  project:
-    build: ./project
-    container_name: project
-    environment:
-      # Use the service name 'postgres' instead of 'localhost'
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-aiworkbench}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-aiworkbench}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-aiworkbench}
-      SPRING_CLOUD_CONSUL_HOST: consul
-    networks:
-      - ai-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-      consul:
-        condition: service_healthy
-    ports:
-      - "8084:8080"
+  # project:
+  #   build: ./project
+  #   container_name: project
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-aiworkbench}
+  #     SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-aiworkbench}
+  #     SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-aiworkbench}
+  #     SPRING_CLOUD_CONSUL_HOST: consul
+  #   networks:
+  #     - workbench-network
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     consul:
+  #       condition: service_healthy
+  #   ports:
+  #     - "8084:8080"
 
 volumes:
   postgres_data:
 
 networks:
-  ai-network:
+  workbench-network:
     driver: bridge
