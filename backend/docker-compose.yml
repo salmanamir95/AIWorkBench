@@ -1,4 +1,7 @@
 services:
+  # ============================================================
+  # Consul (Service Discovery)
+  # ============================================================
   consul:
     image: hashicorp/consul:latest
     container_name: consul
@@ -13,61 +16,111 @@ services:
       timeout: 5s
       retries: 5
 
+  # ============================================================
+  # PostgreSQL
+  # ============================================================
   postgres:
     image: postgres:17-alpine
     container_name: postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-aiworkbench}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aiworkbench}
-      POSTGRES_DB: ${POSTGRES_DB:-aiworkbench}
+      POSTGRES_USER: aiworkbench
+      POSTGRES_PASSWORD: aiworkbench
+      POSTGRES_DB: aiworkbench
     ports:
-      - "${POSTGRES_PORT:-5433}:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - workbench-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U aiworkbench -d aiworkbench"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
 
+  # ============================================================
+  # Services
+  # ============================================================
   gateway:
     build: ./gateway
     container_name: gateway
-    ports:
-      - "8083:8080"
+    ports: ["8086:8080"]
     environment:
-      - SPRING_CLOUD_CONSUL_HOST=consul
-      - SPRING_CLOUD_CONSUL_DISCOVERY_ENABLED=true
-    networks:
-      - workbench-network
+      SPRING_CLOUD_CONSUL_HOST: consul
+    networks: [workbench-network]
     depends_on:
-      consul:
-        condition: service_healthy
+      consul: {condition: service_healthy}
 
   project:
     build: ./project
     container_name: project
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-aiworkbench}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-aiworkbench}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-aiworkbench}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/project_db
+      SPRING_DATASOURCE_USERNAME: aiworkbench
+      SPRING_DATASOURCE_PASSWORD: aiworkbench
       SPRING_CLOUD_CONSUL_HOST: consul
-    networks:
-      - workbench-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-      consul:
-        condition: service_healthy
-    ports:
-      - "8084:8080"
+    networks: [workbench-network]
+    depends_on: {postgres: {condition: service_healthy}}
 
-volumes:
-  postgres_data:
+  auth:
+    build: ./auth
+    container_name: auth
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: aiworkbench
+      SPRING_DATASOURCE_PASSWORD: aiworkbench
+      SPRING_CLOUD_CONSUL_HOST: consul
+    networks: [workbench-network]
+    depends_on: {postgres: {condition: service_healthy}}
+
+  security:
+    build: ./security
+    container_name: security
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/security
+      SPRING_DATASOURCE_USERNAME: aiworkbench
+      SPRING_DATASOURCE_PASSWORD: aiworkbench
+      SPRING_CLOUD_CONSUL_HOST: consul
+    networks: [workbench-network]
+    depends_on: {postgres: {condition: service_healthy}}
+
+  ai:
+    build: ./ai
+    container_name: ai
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ai_db
+      SPRING_DATASOURCE_USERNAME: aiworkbench
+      SPRING_DATASOURCE_PASSWORD: aiworkbench
+      SPRING_CLOUD_CONSUL_HOST: consul
+    networks: [workbench-network]
+    depends_on: {postgres: {condition: service_healthy}}
+
+  task:
+    build: ./task
+    container_name: task
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/task_db
+      SPRING_DATASOURCE_USERNAME: aiworkbench
+      SPRING_DATASOURCE_PASSWORD: aiworkbench
+      SPRING_CLOUD_CONSUL_HOST: consul
+    networks: [workbench-network]
+    depends_on: {postgres: {condition: service_healthy}}
+
+  user:
+    build: ./user
+    container_name: user
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/users
+      SPRING_DATASOURCE_USERNAME: aiworkbench
+      SPRING_DATASOURCE_PASSWORD: aiworkbench
+      SPRING_CLOUD_CONSUL_HOST: consul
+    networks: [workbench-network]
+    depends_on: {postgres: {condition: service_healthy}}
 
 networks:
   workbench-network:
     driver: bridge
+volumes:
+  postgres_data:
