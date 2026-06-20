@@ -6,16 +6,13 @@ services:
     command: agent -dev -client 0.0.0.0
     ports:
       - "8500:8500"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.1'
-          memory: 200M
     healthcheck:
       test: ["CMD", "consul", "members"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 3
+    networks:
+      - workbench-net
 
   # Database
   postgres:
@@ -27,16 +24,14 @@ services:
       POSTGRES_DB: auth_db
     ports:
       - "5433:5432"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.1'
-          memory: 200M
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d auth_db"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 20s
+    networks:
+      - workbench-net
 
   # Gateway Service
   gateway:
@@ -44,26 +39,19 @@ services:
     container_name: gateway
     ports:
       - "8080:8080"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.1'
-          memory: 200M
     depends_on:
       consul:
         condition: service_healthy
     environment:
       - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    networks:
+      - workbench-net
 
   # Auth Service
   auth:
     build: ./auth
     container_name: auth
-    deploy:
-      resources:
-        limits:
-          cpus: '0.1'
-          memory: 200M
     depends_on:
       consul:
         condition: service_healthy
@@ -71,4 +59,13 @@ services:
         condition: service_healthy
     environment:
       - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/auth_db
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+    networks:
+      - workbench-net
+
+networks:
+  workbench-net:
+    driver: bridge
