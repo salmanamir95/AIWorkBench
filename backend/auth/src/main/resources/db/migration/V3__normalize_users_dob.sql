@@ -1,2 +1,0 @@
-ALTER TABLE users
-    ALTER COLUMN dob TYPE DATE USING dob::date;

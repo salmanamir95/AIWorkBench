@@ -1,7 +1,0 @@
-!ai/src/main/resources/application.properties
-!auth/src/main/resources/application.properties
-!gateway/src/main/resources/application.properties
-!project/src/main/resources/application.properties
-!security/src/main/resources/application.properties
-!task/src/main/resources/application.properties
-!user/src/main/resources/application.properties
