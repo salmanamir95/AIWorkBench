@@ -6,6 +6,11 @@ services:
     command: agent -dev -client 0.0.0.0
     ports:
       - "8500:8500"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 200M
     healthcheck:
       test: ["CMD", "consul", "members"]
       interval: 5s
@@ -22,6 +27,11 @@ services:
       POSTGRES_DB: auth_db
     ports:
       - "5433:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 200M
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d auth_db"]
       interval: 5s
@@ -34,6 +44,11 @@ services:
     container_name: gateway
     ports:
       - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 200M
     depends_on:
       consul:
         condition: service_healthy
@@ -44,6 +59,11 @@ services:
   auth:
     build: ./auth
     container_name: auth
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 200M
     depends_on:
       consul:
         condition: service_healthy
