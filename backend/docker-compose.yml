@@ -52,6 +52,8 @@ services:
   auth:
     build: ./auth
     container_name: auth
+    ports:
+      - "8081:8081"          # ← added
     depends_on:
       consul:
         condition: service_healthy
@@ -63,6 +65,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/auth_db
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_PORT=8081     # ← added
     networks:
       - workbench-net
 
