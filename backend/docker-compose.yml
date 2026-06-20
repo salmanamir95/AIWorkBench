@@ -1,0 +1,54 @@
+services:
+  # Service Discovery
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul
+    command: agent -dev -client 0.0.0.0
+    ports:
+      - "8500:8500"
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  # Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: auth_db
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d auth_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Gateway Service
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      consul:
+        condition: service_healthy
+    environment:
+      - SPRING_CLOUD_CONSUL_HOST=consul
+
+  # Auth Service
+  auth:
+    build: ./auth
+    container_name: auth
+    depends_on:
+      consul:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/auth_db
