@@ -1,0 +1,19 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user
+
+  main:
+    web-application-type: servlet
+
+  jackson:
+    serialization:
+      indent_output: true
+
+# (Optional but useful for debugging)
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
