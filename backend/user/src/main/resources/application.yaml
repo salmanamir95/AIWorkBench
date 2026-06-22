@@ -11,8 +11,9 @@ spring:
   jackson:
     serialization:
       indent_output: true
-  
-  consul:
+
+  cloud:
+    consul:
       host: localhost
       port: 8500
       discovery:
@@ -21,7 +22,6 @@ spring:
         health-check-path: /actuator/health
         health-check-interval: 10s
 
-# (Optional but useful for debugging)
 logging:
   level:
     root: INFO
@@ -32,6 +32,7 @@ management:
     web:
       exposure:
         include: health,info,metrics
+
   endpoint:
     health:
       show-details: always

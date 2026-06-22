@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class GatewayConfig {
+
     @Bean
     public RouteLocator customRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -16,9 +17,8 @@ public class GatewayConfig {
                         .filters(f -> f
                                 .stripPrefix(0)
                                 .addResponseHeader("X-Gateway", "active"))
-                        .uri("http://localhost:8081"))
+                        .uri("lb://user-service"))   // ✅ FIX HERE
 
                 .build();
     }
-
 }
