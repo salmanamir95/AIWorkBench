@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: user
+    name: user-service
 
   main:
     web-application-type: servlet
@@ -11,9 +11,27 @@ spring:
   jackson:
     serialization:
       indent_output: true
+  
+  consul:
+      host: localhost
+      port: 8500
+      discovery:
+        enabled: true
+        register: true
+        health-check-path: /actuator/health
+        health-check-interval: 10s
 
 # (Optional but useful for debugging)
 logging:
   level:
     root: INFO
     org.springframework.web: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
