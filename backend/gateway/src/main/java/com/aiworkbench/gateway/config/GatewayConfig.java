@@ -16,8 +16,13 @@ public class GatewayConfig {
                         .path("/user/**")
                         .filters(f -> f
                                 .stripPrefix(0)
-                                .addResponseHeader("X-Gateway", "active"))
-                        .uri("lb://user-service"))   // ✅ FIX HERE
+                                .circuitBreaker(config -> config
+                                        .setName("userServiceCB")
+                                        .setFallbackUri("forward:/fallback/user")
+                                )
+                        )
+                        .uri("lb://user-service")
+                )
 
                 .build();
     }
