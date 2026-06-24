@@ -61,6 +61,27 @@ resilience4j:
 
 logging:
   level:
-    org.springframework.cloud.gateway: DEBUG
+    root: INFO
+
+    # Gateway tracing
+    org.springframework.cloud.gateway: TRACE
     org.springframework.cloud.gateway.route: TRACE
+    org.springframework.cloud.gateway.handler: DEBUG
+    org.springframework.cloud.gateway.filter: TRACE
+
+    # Load Balancer
     org.springframework.cloud.loadbalancer: DEBUG
+
+    # Reactor Netty
+    reactor.netty: DEBUG
+    reactor.netty.http.client: DEBUG
+    reactor.netty.http.server: DEBUG
+
+    # Consul
+    org.springframework.cloud.consul: DEBUG
+
+    # Reactive HTTP
+    org.springframework.http.server.reactive: DEBUG
+
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | service=gateway-service | traceId=%X{traceId} | %logger - %msg%n"

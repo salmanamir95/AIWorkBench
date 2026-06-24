@@ -22,11 +22,6 @@ spring:
         health-check-path: /actuator/health
         health-check-interval: 1s
 
-logging:
-  level:
-    root: INFO
-    org.springframework.web: DEBUG
-
 management:
   endpoints:
     web:
@@ -36,3 +31,16 @@ management:
   endpoint:
     health:
       show-details: always
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    org.springframework.web.client.RestTemplate: DEBUG
+    org.springframework.cloud.consul: DEBUG
+    org.springframework.security: DEBUG
+
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | service=user-service | traceId=%X{traceId} | %logger - %msg%n"
