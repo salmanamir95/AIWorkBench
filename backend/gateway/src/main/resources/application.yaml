@@ -85,3 +85,20 @@ logging:
 
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | service=gateway-service | traceId=%X{traceId} | %logger - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      access: unrestricted
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true

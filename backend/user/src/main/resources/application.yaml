@@ -26,11 +26,16 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,gateway,routes
+        include: health,info,metrics,prometheus,gateway,routes
 
   endpoint:
     health:
       show-details: always
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 logging:
   level:
