@@ -1,12 +1,14 @@
 package com.aiworkbench.user.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 
 @RestController
+@RequestMapping("/user")
 public class userController {
 
     @Value("${server.port}")
@@ -14,7 +16,7 @@ public class userController {
 
     @GetMapping("/user")
     public String userService() {
-        return "Hey I am User Service 🚀"+ serverPort;
+        return "Hey I am User Service "+ serverPort;
     }
     
 }
