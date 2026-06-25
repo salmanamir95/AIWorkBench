@@ -110,22 +110,22 @@ management:
       export:
         enabled: true
 
-otel:
-  sdk:
-    disabled: false
+# otel:
+#   sdk:
+#     disabled: false
 
-  service:
-    name: gateway-service
+#   service:
+#     name: gateway-service
 
-  traces:
-    exporter: otlp
+#   traces:
+#     exporter: otlp
 
-  metrics:
-    exporter: none
+#   metrics:
+#     exporter: none
 
-  logs:
-    exporter: none
+#   logs:
+#     exporter: none
 
-  exporter:
-    otlp:
-      endpoint: http://localhost:4317
+#   exporter:
+#     otlp:
+#       endpoint: http://localhost:4317

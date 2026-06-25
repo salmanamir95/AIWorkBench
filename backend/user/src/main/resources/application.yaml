@@ -57,22 +57,22 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | service=user-service | traceId=%X{traceId} | %logger - %msg%n"
 
-otel:
-  sdk:
-    disabled: false
+# otel:
+#   sdk:
+#     disabled: false
 
-  service:
-    name: user-service
+#   service:
+#     name: user-service
 
-  traces:
-    exporter: otlp
+#   traces:
+#     exporter: otlp
 
-  metrics:
-    exporter: none
+#   metrics:
+#     exporter: none
 
-  logs:
-    exporter: none
+#   logs:
+#     exporter: none
 
-  exporter:
-    otlp:
-      endpoint: http://localhost:4317
+#   exporter:
+#     otlp:
+#       endpoint: http://localhost:4317
