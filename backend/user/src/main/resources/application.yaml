@@ -32,6 +32,10 @@ management:
     health:
       show-details: always
 
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
   prometheus:
     metrics:
       export:
@@ -47,5 +51,28 @@ logging:
     org.springframework.cloud.consul: DEBUG
     org.springframework.security: DEBUG
 
+    io.opentelemetry: DEBUG
+    io.opentelemetry.exporter: DEBUG
+
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | service=user-service | traceId=%X{traceId} | %logger - %msg%n"
+
+otel:
+  sdk:
+    disabled: false
+
+  service:
+    name: user-service
+
+  traces:
+    exporter: otlp
+
+  metrics:
+    exporter: none
+
+  logs:
+    exporter: none
+
+  exporter:
+    otlp:
+      endpoint: http://localhost:4317
