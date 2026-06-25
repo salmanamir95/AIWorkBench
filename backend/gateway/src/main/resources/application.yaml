@@ -69,6 +69,9 @@ logging:
     org.springframework.cloud.gateway.handler: DEBUG
     org.springframework.cloud.gateway.filter: TRACE
 
+    io.opentelemetry: DEBUG
+    io.opentelemetry.exporter: DEBUG
+
     # Load Balancer
     org.springframework.cloud.loadbalancer: DEBUG
 
@@ -98,7 +101,31 @@ management:
     prometheus:
       access: unrestricted
 
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
   prometheus:
     metrics:
       export:
         enabled: true
+
+otel:
+  sdk:
+    disabled: false
+
+  service:
+    name: gateway-service
+
+  traces:
+    exporter: otlp
+
+  metrics:
+    exporter: none
+
+  logs:
+    exporter: none
+
+  exporter:
+    otlp:
+      endpoint: http://localhost:4317
