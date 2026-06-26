@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.aiworkbench.user.entities.Departments;
 
 @Repository
-public interface DepartmentRespository extends JpaRepository<Departments, Long>{
+public interface DepartmentRepository extends JpaRepository<Departments, Long>{
 
     // Standard CRUD is already provided by JpaRepository
 

@@ -1,4 +1,4 @@
-package com.aiworkbench.user.entities.enums;
+package com.aiworkbench.user.enums;
 
 public enum user_status {
     ACTIVE,

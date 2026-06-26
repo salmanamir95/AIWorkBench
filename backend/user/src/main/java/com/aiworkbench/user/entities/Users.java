@@ -7,7 +7,7 @@ import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
 
-import com.aiworkbench.user.entities.enums.user_status;
+import com.aiworkbench.user.enums.user_status;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

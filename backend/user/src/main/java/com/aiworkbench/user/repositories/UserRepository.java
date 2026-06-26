@@ -1,7 +1,8 @@
 package com.aiworkbench.user.repositories;
 
 import com.aiworkbench.user.entities.Users;
-import com.aiworkbench.user.entities.enums.user_status;
+import com.aiworkbench.user.enums.user_status;
+
 import org.springframework.data.domain.Pageable; // Correct Import
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
