@@ -12,6 +12,10 @@ spring:
     serialization:
       indent_output: true
 
+  threads:
+    virtual:
+      enabled: true
+
   cloud:
     consul:
       host: localhost
@@ -26,6 +30,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/aiworkbench_user_db
     username: aiworkbench_user_usr
     password: 123456
+    hikari:
+      # Since virtual threads allow for higher concurrency, 
+      # you may need a larger pool than the default (usually 10)
+      maximum-pool-size: 50
+      connection-timeout: 30000
   
   jpa:
     hibernate:
