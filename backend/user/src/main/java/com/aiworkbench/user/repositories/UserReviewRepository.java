@@ -1,4 +1,6 @@
-package com.aiworkbench.user.respositories;
+package com.aiworkbench.user.repositories;
+
+import java.util.List;
 
 import org.hibernate.annotations.processing.Find;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +11,7 @@ import com.aiworkbench.user.entities.UserReviews;
 @Repository
 public interface UserReviewRepository extends JpaRepository<UserReviews, Long> {
 
-    / Find all reviews received by a specific user
+    // Find all reviews received by a specific user
     List<UserReviews> findByUserId(Long userId);
 
     // Find all reviews written by a specific reviewer

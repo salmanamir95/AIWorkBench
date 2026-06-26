@@ -1,4 +1,4 @@
-package com.aiworkbench.user.respositories;
+package com.aiworkbench.user.repositories;
 
 import java.util.Optional;
 
