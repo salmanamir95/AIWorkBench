@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS user_reviews, user_department_role, employment_history, roles, users, departments, flyway_schema_history CASCADE;
+-- DROP TABLE IF EXISTS user_reviews, user_department_role, employment_history, roles, users, departments, flyway_schema_history CASCADE;
 
 
 -- Departments with uniqueness constraints
