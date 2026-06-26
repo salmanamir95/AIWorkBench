@@ -1,23 +1,20 @@
 package com.aiworkbench.user.repositories;
 
-import java.util.Optional;
-
+import com.aiworkbench.user.entities.Departments;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.aiworkbench.user.entities.Departments;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface DepartmentRepository extends JpaRepository<Departments, Long>{
-
-    // Standard CRUD is already provided by JpaRepository
-
-    // Find by unique business keys
+public interface DepartmentRepository extends JpaRepository<Departments, Long> {
     Optional<Departments> findByName(String name);
-    
     Optional<Departments> findByCostCenterCode(String costCenterCode);
-
-    // Check existence to prevent duplicate names/codes in service layer
+    
+    // Search functionality using partial name matching
+    List<Departments> findByNameContainingIgnoreCase(String name);
+    
     boolean existsByName(String name);
     boolean existsByCostCenterCode(String costCenterCode);
 }
