@@ -1,5 +1,13 @@
 package com.aiworkbench.user.mappers;
 
+import org.springframework.stereotype.Component;
+
+import com.aiworkbench.user.dtos.RoleDTO;
+import com.aiworkbench.user.entities.Roles;
+import com.aiworkbench.user.repositories.DepartmentRepository;
+
+import lombok.RequiredArgsConstructor;
+
 @Component
 @RequiredArgsConstructor
 public class RoleMapper {
