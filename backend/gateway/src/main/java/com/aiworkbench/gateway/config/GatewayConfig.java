@@ -11,11 +11,10 @@ public class GatewayConfig {
     @Bean
     public RouteLocator customRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-
                 .route("user-service", r -> r
-                        .path("/user/**")
+                        .path("/user/**") // Matches /user/users, /user/udr, etc.
                         .filters(f -> f
-                                .stripPrefix(0)
+                                .stripPrefix(1) // Removes '/user', passes '/users/...' to service
                                 .circuitBreaker(config -> config
                                         .setName("userServiceCB")
                                         .setFallbackUri("forward:/fallback/user")
@@ -23,7 +22,6 @@ public class GatewayConfig {
                         )
                         .uri("lb://user-service")
                 )
-
                 .build();
     }
 }
