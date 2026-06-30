@@ -1,10 +1,17 @@
 -- 1. User Credentials
+-- 1. Updated User Credentials
 CREATE TABLE users (
-    id UUID PRIMARY KEY,
-    username VARCHAR(255) UNIQUE NOT NULL,
+    id UUID PRIMARY KEY,                   -- Internal Auth Service ID (for OAuth2)
+    user_id BIGINT UNIQUE NOT NULL,        -- The ID from the User Microservice (The "Binding" Key)
+    email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     enabled BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    
+    -- Audit Fields
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE
 );
 
 -- 2. OAuth2 Registered Clients (Required by Spring Auth Server)
