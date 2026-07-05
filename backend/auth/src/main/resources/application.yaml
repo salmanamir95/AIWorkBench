@@ -15,6 +15,15 @@ spring:
     pool:
       initial-size: 10
       max-size: 50
+  
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/aiworkbench_auth_db
+    user: aiworkbench_auth_usr
+    password: 123456
+
+    locations:
+      - classpath:db/migration
 
   # Consul Configuration
   cloud:

@@ -8,14 +8,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Component
 @Slf4j
+@Component
 public class TraceFilter extends OncePerRequestFilter {
 
     private static final String TRACE_ID_HEADER = "X-Trace-Id";
@@ -26,44 +25,31 @@ public class TraceFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        final long start = System.nanoTime();
+
         String incomingTraceId = request.getHeader(TRACE_ID_HEADER);
 
         final String traceId = (incomingTraceId == null || incomingTraceId.isBlank())
                 ? UUID.randomUUID().toString()
                 : incomingTraceId;
 
-        // Store traceId in MDC so it appears in every log
-        MDC.put("traceId", traceId);
-
-        // Return the trace ID to the caller
         response.setHeader(TRACE_ID_HEADER, traceId);
 
-        long start = System.currentTimeMillis();
+        log.info("Incoming {} {} traceId={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                traceId);
 
         try {
-            log.info("➡️ Incoming Request | method={} | uri={}",
-                    request.getMethod(),
-                    request.getRequestURI());
-
             filterChain.doFilter(request, response);
-
-            long duration = System.currentTimeMillis() - start;
-
-            log.info("✅ Request Completed | status={} | timeMs={}",
-                    response.getStatus(),
-                    duration);
-
-        } catch (Exception ex) {
-
-            log.error("❌ Request Failed | status={} | error={}",
-                    response.getStatus(),
-                    ex.getMessage(),
-                    ex);
-
-            throw ex;
-
         } finally {
-            MDC.clear();
+
+            long duration = (System.nanoTime() - start) / 1_000_000;
+
+            log.info("Completed {} in {} ms traceId={}",
+                    response.getStatus(),
+                    duration,
+                    traceId);
         }
     }
 }
