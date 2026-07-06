@@ -4,54 +4,52 @@ server:
 spring:
   application:
     name: auth-service
-  main:
-    web-application-type: reactive
 
-  # REACTIVE Database Configuration
-  r2dbc:
-    url: r2dbc:postgresql://localhost:5432/aiworkbench_auth_db
+  datasource:
+    url: jdbc:postgresql://localhost:5432/aiworkbench_auth_db
     username: aiworkbench_auth_usr
     password: 123456
-    pool:
-      initial-size: 10
-      max-size: 50
-  
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+
   flyway:
     enabled: true
-    url: jdbc:postgresql://localhost:5432/aiworkbench_auth_db
-    user: aiworkbench_auth_usr
-    password: 123456
-
     locations:
       - classpath:db/migration
 
-  # Consul Configuration
   cloud:
     consul:
       host: localhost
       port: 8500
+
       discovery:
         enabled: true
         register: true
         health-check-path: /actuator/health
         health-check-interval: 10s
+
       config:
         enabled: true
-        fail-fast: false  # Prevents crash if Consul is not ready at millisecond 0
-        request-read-timeout: 5000 
-        request-connect-timeout: 2000
+        fail-fast: false
+        request-connect-timeout: 2s
+        request-read-timeout: 5s
 
-  # Proper Config Import
   config:
     import: "optional:consul:"
 
-# Observability & Metrics
 management:
   endpoints:
     web:
       base-path: /actuator
       exposure:
         include: health,info,prometheus
+
   endpoint:
     prometheus:
       enabled: true
@@ -60,4 +58,4 @@ logging:
   level:
     root: INFO
     org.springframework.cloud.consul: DEBUG
-    org.springframework.r2dbc: DEBUG
+    org.hibernate.SQL: DEBUG
