@@ -1,13 +1,16 @@
-package com.aiworkbench.auth.dtos;
+package com.aiworkbench.auth.dtos; // Ensure this package matches your DTO path
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor; // <--- ADD THIS
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-import lombok.Builder;
-import lombok.Data;
-
 @Data
 @Builder
+@NoArgsConstructor // <--- Required for MapStruct
+@AllArgsConstructor // <--- Required for Builder
 public class UserDTO {
     private UUID id;
     private Long userId;
